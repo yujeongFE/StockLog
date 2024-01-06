@@ -1,0 +1,12 @@
+var url = 'https://newsapi.org/v2/everything?' +
+          'q=Apple&' +
+          'from=2024-01-06&' +
+          'sortBy=popularity&' +
+          'apiKey=1277dcdf93f8462a96f2efd5778607ae';
+
+var req = new Request(url);
+
+fetch(req)
+    .then(function(response) {
+        console.log(response.json());
+    })
