@@ -5,7 +5,7 @@ curl https://newsapi.org/v2/everything -G \
     -d sortBy=popularity \
     -d apiKey=1277dcdf93f8462a96f2efd5778607ae
 
-// 국가또는
+// 국가 또 는카테고리의 현재 인기 헤드라인
 curl https://newsapi.org/v2/top-headlines -G \
     -d country=us \
     -d apiKey=1277dcdf93f8462a96f2efd5778607ae
