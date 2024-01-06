@@ -4,7 +4,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.sql.*;
 
-public class Login {
+public class LoginSignin {
     // phone number(tel) format
     private static MaskFormatter createFormatter(String s) {
         MaskFormatter formatter = null;
@@ -258,7 +258,7 @@ public class Login {
 
         loginFrame.add(panel);
 
-        loginFrame.setSize(1020, 720);
+        loginFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
         loginFrame.setLocationRelativeTo(null);
         loginFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -277,6 +277,11 @@ public class Login {
 
                         if (resultSet.next()) {
                             JOptionPane.showMessageDialog(loginFrame, id + "님 로그인에 성공하셨습니다.");
+                            // SwingUtilities.invokeLater(new Runnable() {
+                            //                        public void run() {
+                            //                            new Home().createAndShowGUI(); // Home.java의 createAndShowGUI 메소드 호출
+                            //                        }
+                            //                    });
                         } else {
                             JOptionPane.showMessageDialog(loginFrame, "로그인에 실패했습니다. 회원이 아니시면 회원가입을 진행해주세요.");
                         }
