@@ -118,7 +118,7 @@ public class Login {
                     @Override
                     public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs)
                             throws BadLocationException {
-                        if (text.matches("[a-zA-Z]*")) {
+                        if (text.matches("[a-zA-Z가-힣]*")) {
                             super.replace(fb, offset, length, text, attrs);
                         }
                     }
@@ -145,6 +145,7 @@ public class Login {
                         String confirmPasswd = new String(signUpPasswdConfirm.getPassword());
                         String name = signUpName.getText();
                         String tel = signUpTel.getText().replace("-", ""); // 하이픈 제거
+                        tel = tel.replace("010", ""); // 010 제거
 
                         if (id.isEmpty() || passwd.isEmpty() || confirmPasswd.isEmpty() || name.isEmpty() || tel.isEmpty()) {
                             JOptionPane.showMessageDialog(signUpFrame, "모든 입력란을 채워주세요.");
@@ -257,7 +258,7 @@ public class Login {
 
         loginFrame.add(panel);
 
-        loginFrame.setSize(420, 350);
+        loginFrame.setSize(1020, 720);
         loginFrame.setLocationRelativeTo(null);
         loginFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -277,7 +278,7 @@ public class Login {
                         if (resultSet.next()) {
                             JOptionPane.showMessageDialog(loginFrame, id + "님 로그인에 성공하셨습니다.");
                         } else {
-                            JOptionPane.showMessageDialog(loginFrame, "로그인에 실패했습니다.");
+                            JOptionPane.showMessageDialog(loginFrame, "로그인에 실패했습니다. 회원이 아니시면 회원가입을 진행해주세요.");
                         }
 
                         resultSet.close();
