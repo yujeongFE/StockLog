@@ -27,13 +27,13 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Scanner;
 
-public class StockChartApp extends JFrame {
+public class IntradayChartApp extends JFrame {
 
-    public StockChartApp(String title, String symbol, DefaultCategoryDataset dataset) {
+    public IntradayChartApp(String title, String symbol, DefaultCategoryDataset dataset) {
         super(title);
         JFreeChart chart = ChartFactory.createLineChart(
-                "Stock Chart - " + symbol, // 차트 제목
-                "Date", // x축 레이블
+                "Intraday Chart - " + symbol, // 차트 제목
+                "Time", // x축 레이블
                 "Closing Price", // y축 레이블
                 dataset
         );
@@ -57,7 +57,7 @@ public class StockChartApp extends JFrame {
 
         try {
             // API 엔드포인트 및 요청 URL 생성
-            String apiUrl = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=" + symbol + "&apikey=" + apiKey;
+            String apiUrl = "https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=" + symbol + "&interval=1min&apikey=" + apiKey;
             URL url = new URL(apiUrl);
 
             // HTTP 요청 보내기
@@ -80,17 +80,17 @@ public class StockChartApp extends JFrame {
             JsonObject jsonResponse = JsonParser.parseString(response.toString()).getAsJsonObject();
 
             // 시계열 데이터에 해당하는 부분 가져오기
-            JsonObject timeSeriesData = jsonResponse.getAsJsonObject("Time Series (Daily)");
+            JsonObject timeSeriesData = jsonResponse.getAsJsonObject("Time Series (1min)");
 
             // 가져온 데이터를 데이터셋에 추가
-            for (String date : timeSeriesData.keySet()) {
-                String closingPrice = timeSeriesData.getAsJsonObject(date).get("4. close").getAsString();
-                dataset.addValue(Double.parseDouble(closingPrice), "Closing Price", date);
+            for (String time : timeSeriesData.keySet()) {
+                String closingPrice = timeSeriesData.getAsJsonObject(time).get("4. close").getAsString();
+                dataset.addValue(Double.parseDouble(closingPrice), "Closing Price", time);
             }
 
             // 차트 생성 및 표시
             SwingUtilities.invokeLater(() -> {
-                StockChartApp chartApp = new StockChartApp("Stock Chart Example", symbol, dataset);
+                IntradayChartApp chartApp = new IntradayChartApp("Intraday Chart Example", symbol, dataset);
                 chartApp.setSize(800, 600);
                 chartApp.setLocationRelativeTo(null);
                 chartApp.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
