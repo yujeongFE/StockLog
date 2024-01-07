@@ -19,8 +19,10 @@ public class NewsApiExample {
             System.out.print("Enter the category (e.g., business, entertainment, general, health, science, sports, technology, sources): ");
             String category = reader.readLine();
 
+            //국가별 인기 헤드라인 출력
             getTopHeadlines(apiKey, country);
 
+            //특정 카테고리의 인기 헤드라인 출력
             getTopHeadlines(apiKey, category);
 
             reader.close();
@@ -49,6 +51,7 @@ public class NewsApiExample {
             reader.close();
             connection.disconnect();
 
+            // 콘솔에 출력
             System.out.println("Response: " + response.toString());
         } catch (IOException e) {
             e.printStackTrace();
