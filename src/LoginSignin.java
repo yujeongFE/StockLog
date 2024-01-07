@@ -19,6 +19,7 @@ public class LoginSignin {
 
     public static void main(String[] args) {
         DBconnection dbConnector = new DBconnection(); // DB 연결 객체 생성
+
         JFrame loginFrame = new JFrame("로그인창");
         JPanel panel = new JPanel(new GridBagLayout());
 
