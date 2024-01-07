@@ -15,6 +15,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Scanner;
@@ -37,108 +38,91 @@ class Panel2Action { // 매도주식
 // 패널 3에 대한 동작을 처리하는 클래스
 class Panel3Action { // 관심주식
     public static void addFunctionality(JPanel panel) {
-        // 패널 3에 추가할 기능 구현
-        try {
-            JLabel stock_search = new JLabel("주식 검색 : "); // 주식 검색
-            JTextField text = new JTextField(15);
-            String stockName = text.getText(); // 주식 이름 검색
+        // 사용자에게 종목명 입력 받기
+        try{
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("종목명을 입력해주세요: ");
+        String stockName = scanner.nextLine();
 
-            // 날짜 범위 설정
-            String[] dateRange = getLastBusinessDayRange();
-            String frdt = dateRange[0];
-            String todt = dateRange[1];
+        // 날짜 범위 설정
+        String[] dateRange = getLastBusinessDayRange();
+        String frdt = dateRange[0];
+        String todt = dateRange[1];
 
-            // String stockInfo = getStockInfo(stockName); // getStockInfo 함수는 주식 정보를 가져오는 메서드
+        // 종목명을 URL 인코딩하여 API 호출
+        StringBuffer stockPriceData = getStockPrice(URLEncoder.encode(stockName, "UTF-8"), frdt, todt);
 
-            StringBuffer stockPriceData = getStockInfo(stockName, frdt, todt);
-
-            if (stockPriceData.length() > 0) {
-                // 데이터 파싱 및 표로 정리하여 출력
-                printStockPriceTable(stockPriceData);
-            } else {
-                JOptionPane.showMessageDialog(panel, "해당 주식 데이터가 없습니다. 다시 입력하여 주세요");
-            }
-
-        } catch (Exception e) {
-            // 예외 처리
-            e.printStackTrace();
-        }
-        /*JButton button = new JButton("주식 정보 가져오기");
-        button.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // 주식 정보를 받아오는 API 요청 예시 (실제 API 사용 시에는 해당 API의 URL이나 라이브러리를 사용해야 함)
-                String stockName = JOptionPane.showInputDialog(panel, "주식 이름을 입력하세요:");
-                // API 요청 후 받은 데이터를 처리하고 출력하는 예시
-                String stockInfo = getStockInfo(stockName); // getStockInfo 함수는 주식 정보를 가져오는 메서드라고 가정
-                JOptionPane.showMessageDialog(panel, stockInfo); // stock이 보여지도록함
-
-                // 메모를 저장하는 코드 예시 (실제로는 저장 위치 등을 고려해야 함)
-                String memo = JOptionPane.showInputDialog(panel, "메모를 작성하세요:");
-                saveMemo(stockName, memo); // saveMemo 함수는 메모를 저장하는 메서드라고 가정
-            }
-        });
-        panel.add(button);*/
-    }
-
-    // 날짜 조정하는 메소드
-    private static String[] getLastBusinessDayRange() {
-        Calendar calendar = Calendar.getInstance();
-
-        // 현재 날짜가 토요일이면 금요일로, 일요일이면 금요일로 되돌림
-        int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
-        if (dayOfWeek == Calendar.SATURDAY) {
-            calendar.add(Calendar.DAY_OF_MONTH, -1);
-        } else if (dayOfWeek == Calendar.SUNDAY) {
-            calendar.add(Calendar.DAY_OF_MONTH, -2);
+        if (stockPriceData.length() > 0) {
+            // 데이터 파싱 및 표로 정리하여 출력
+            printStockPriceTable(stockPriceData);
+        } else {
+            System.out.println("No stock price data available for the specified parameters.");
         }
 
-        // 현재 날짜를 todt로 설정
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
-        String todt = dateFormat.format(calendar.getTime());
+    } catch (Exception e) {
+        // 예외 처리
+        e.printStackTrace();
+    }
+}
 
-        // frdt를 todt 기준으로 설정
-        calendar.add(Calendar.MONTH, -1);
-        String frdt = dateFormat.format(calendar.getTime());
+private static String[] getLastBusinessDayRange() {
+    Calendar calendar = Calendar.getInstance();
 
-        return new String[]{frdt, todt};
+    // 현재 날짜가 토요일이면 금요일로, 일요일이면 금요일로 되돌림
+    int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
+    if (dayOfWeek == Calendar.SATURDAY) {
+        calendar.add(Calendar.DAY_OF_MONTH, -1);
+    } else if (dayOfWeek == Calendar.SUNDAY) {
+        calendar.add(Calendar.DAY_OF_MONTH, -2);
     }
 
-    // 주식 API 받아오는 메소드
-    private static StringBuffer getStockInfo(String likeSrtnCd, String frdt, String todt) throws Exception {
-        BufferedReader in = null;
-        StringBuffer strBuffer = new StringBuffer();
+    // 현재 날짜를 todt로 설정
+    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+    String todt = dateFormat.format(calendar.getTime());
 
-        try {
-            // 외부 API 호출을 위한 URL 설정
-            String urlStr = "https://api.odcloud.kr/api/GetStockSecuritiesInfoService/v1/getStockPriceInfo?";
-            urlStr += "serviceKey=" + "1%2FWP%2BVc3M5kGU2bikqOuBl9hAtMQ7OeqB24EL0llGF9zC75kdgM1jbsTy90LiI9hmDwU7jeFjW8P%2B1VPFtc%2BDg%3D%3D";  // API 키를 적절하게 설정
-            urlStr += "&beginBasDt=" + frdt;
-            urlStr += "&endBasDt=" + todt;
-            urlStr += "&likeSrtnCd=" + likeSrtnCd;  // 변수명 수정
+    // frdt를 todt 기준으로 설정
+    calendar.add(Calendar.MONTH, -1);
+    String frdt = dateFormat.format(calendar.getTime());
 
-            URL obj = new URL(urlStr);
-            HttpURLConnection con = (HttpURLConnection) obj.openConnection();
-            con.setRequestMethod("GET");
+    return new String[]{frdt, todt};
+}
 
-            // API 응답 읽기
-            in = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF-8"));
+private static StringBuffer getStockPrice(String likeSrtnCd, String frdt, String todt) throws Exception {
+    BufferedReader in = null;
+    StringBuffer strBuffer = new StringBuffer();
 
-            String line;
-            while ((line = in.readLine()) != null) {
-                strBuffer.append(line);
-            }
+    try {
+        // 외부 API 호출을 위한 URL 설정
+        String urlStr = "https://api.odcloud.kr/api/GetStockSecuritiesInfoService/v1/getStockPriceInfo?";
+        urlStr += "serviceKey=" + "1%2FWP%2BVc3M5kGU2bikqOuBl9hAtMQ7OeqB24EL0llGF9zC75kdgM1jbsTy90LiI9hmDwU7jeFjW8P%2B1VPFtc%2BDg%3D%3D";  // API 키를 적절하게 설정
+        urlStr += "&beginBasDt=" + frdt;
+        urlStr += "&endBasDt=" + todt;
+        urlStr += "&itmsNm=" + likeSrtnCd;  
 
-        } finally {
-            // BufferedReader 리소스 닫기
-            if (in != null) {
-                in.close();
-            }
+        URL obj = new URL(urlStr);
+        HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+        con.setRequestMethod("GET");
+
+        // API 응답 읽기
+        in = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF-8"));
+
+        String line;
+        while ((line = in.readLine()) != null) {
+            strBuffer.append(line);
         }
 
-        return strBuffer;
+    } finally {
+        // BufferedReader 리소스 닫기
+        if (in != null) {
+            in.close();
+        }
     }
-    private static void printStockPriceTable(StringBuffer xmlData) throws Exception {
+
+    return strBuffer;
+}
+
+
+private static void printStockPriceTable(StringBuffer xmlData) throws Exception {
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
         ByteArrayInputStream input = new ByteArrayInputStream(xmlData.toString().getBytes("UTF-8"));

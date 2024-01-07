@@ -1,3 +1,13 @@
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Scanner;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -5,30 +15,23 @@ import org.w3c.dom.NodeList;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Scanner;
 
 public class Main {
 
     public static void main(String[] args) {
         try {
-            // 사용자에게 단축종목코드 입력 받기
+            // 사용자에게 종목명 입력 받기
             Scanner scanner = new Scanner(System.in);
-            System.out.print("종목 코드를 입력해주세요: ");
-            String likeSrtnCd = scanner.nextLine();
+            System.out.print("종목명을 입력해주세요: ");
+            String stockName = scanner.nextLine();
 
             // 날짜 범위 설정
             String[] dateRange = getLastBusinessDayRange();
             String frdt = dateRange[0];
             String todt = dateRange[1];
 
-            StringBuffer stockPriceData = getStockPrice(likeSrtnCd, frdt, todt);
+            // 종목명을 URL 인코딩하여 API 호출
+            StringBuffer stockPriceData = getStockPrice(URLEncoder.encode(stockName, "UTF-8"), frdt, todt);
 
             if (stockPriceData.length() > 0) {
                 // 데이터 파싱 및 표로 정리하여 출력
@@ -75,7 +78,7 @@ public class Main {
             urlStr += "serviceKey=" + "1%2FWP%2BVc3M5kGU2bikqOuBl9hAtMQ7OeqB24EL0llGF9zC75kdgM1jbsTy90LiI9hmDwU7jeFjW8P%2B1VPFtc%2BDg%3D%3D";  // API 키를 적절하게 설정
             urlStr += "&beginBasDt=" + frdt;
             urlStr += "&endBasDt=" + todt;
-            urlStr += "&likeSrtnCd=" + likeSrtnCd;  // 변수명 수정
+            urlStr += "&itmsNm=" + likeSrtnCd;  // 변수명 수정
 
             URL obj = new URL(urlStr);
             HttpURLConnection con = (HttpURLConnection) obj.openConnection();
