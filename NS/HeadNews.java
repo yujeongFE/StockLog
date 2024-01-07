@@ -10,8 +10,8 @@ public class NewsApiExample {
         try {
             BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
-            System.out.print("Enter your NewsAPI key: ");
-            String apiKey = reader.readLine();
+            // NewsAPI에서 발급받은 API 키
+            String apiKey = "1277dcdf93f8462a96f2efd5778607ae";
 
             System.out.print("Enter the country code (e.g., us, kr, jp): ");
             String country = reader.readLine();
