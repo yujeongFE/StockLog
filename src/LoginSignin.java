@@ -163,6 +163,7 @@ public class LoginSignin {
                                 signUpFrame.dispose();
                                 loginFrame.setVisible(true);
                             } catch (SQLException ex) {
+                                // 해야 할 것 - Id가 겹칠 경우 에러 찰;
                                 ex.printStackTrace();
                                 JOptionPane.showMessageDialog(signUpFrame, "회원가입에 실패하였습니다.");
                             }
@@ -277,11 +278,11 @@ public class LoginSignin {
 
                         if (resultSet.next()) {
                             JOptionPane.showMessageDialog(loginFrame, id + "님 로그인에 성공하셨습니다.");
-                            // SwingUtilities.invokeLater(new Runnable() {
-                            //                        public void run() {
-                            //                            new Home().createAndShowGUI(); // Home.java의 createAndShowGUI 메소드 호출
-                            //                        }
-                            //                    });
+
+                            loginFrame.dispose(); // 로그인 창 닫기
+                            SwingUtilities.invokeLater(() -> {
+                                new Home(); // 홈 화면 열기
+                            });
                         } else {
                             JOptionPane.showMessageDialog(loginFrame, "로그인에 실패했습니다. 회원이 아니시면 회원가입을 진행해주세요.");
                         }
