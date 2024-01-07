@@ -3,61 +3,18 @@ import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
 import java.awt.*;
 
-// 패널 1에 대한 동작을 처리하는 클래스
-class Panel1Action { // 종목 지수
-    public static void addFunctionality(JPanel panel) {
-        // 패널 1에 추가할 기능 구현
-    }
-}
-
-// 패널 2에 대한 동작을 처리하는 클래스
-class Panel2Action { // 매도주식
-    public static void addFunctionality(JPanel panel) {
-        // 패널 2에 추가할 기능 구현
-    }
-}
-
-// 패널 3에 대한 동작을 처리하는 클래스
-class Panel3Action { // 관심주식
-    public static void addFunctionality(JPanel panel) {
-        // 패널 3에 추가할 기능 구현
-    }
-}
-
-// 패널 4에 대한 동작을 처리하는 클래스
-class Panel4Action { // 매도주식
-    public static void addFunctionality(JPanel panel) {
-        // 패널 4에 추가할 기능 구현
-    }
-}
-
-// 패널 5에 대한 동작을 처리하는 클래스
-class Panel5Action { // 매도주식
-    public static void addFunctionality(JPanel panel) {
-        // 패널 5에 추가할 기능 구현
-    }
-}
-
-// 하단바에 대한 동작을 처리하는 클래스
-class Panel6Action { // 매도주식
-    public static void addFunctionality(JPanel panel) {
-        // 하단바에 추가할 기능 구현
-    }
-}
-
-
-
-public class Home {
-    public Home() {
+// 홈화면에서 주식 클릭했을 때 나오는 화면 // 껍데기만 있고 기능 구현X
+public class StockHome {
+    public StockHome() {
         JFrame frame = new JFrame("주식 매매 관리 시스템");
 
         JPanel mainPanel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
 
-        JPanel topLeftPanel = createPanelWithBorder("1"); // 종목지수
-        JPanel topRightPanel = createPanelWithBorder("2"); // 매도주식
-        JPanel bottomLeftPanel = createPanelWithBorder("3"); // 관심주식
-        JPanel bottomRightPanel = createPanelWithBorder("4"); // 보유주식
+        JPanel topLeftPanel = createPanelWithBorder("1");
+        JPanel topRightPanel = createPanelWithBorder("2");
+        JPanel bottomLeftPanel = createPanelWithBorder("3");
+        JPanel bottomRightPanel = createPanelWithBorder("4");
         JPanel rightPanel = createPanelWithBorder("5");
 
         JPanel bottomPanel = new JPanel(); // 하단바
@@ -65,14 +22,6 @@ public class Home {
         bottomPanel.setPreferredSize(new Dimension(frame.getWidth(), 50)); // 높이 50px
 
         frame.add(bottomPanel, BorderLayout.SOUTH);
-
-        // 패널에 기능 추가
-        Panel1Action.addFunctionality(topLeftPanel); // 패널 1에 기능 추가
-        Panel2Action.addFunctionality(topRightPanel); // 패널 2에 기능 추가
-        Panel3Action.addFunctionality(bottomLeftPanel); // 패널 3에 기능 추가
-        Panel4Action.addFunctionality(bottomRightPanel); // 패널 4에 기능 추가
-        Panel5Action.addFunctionality(rightPanel); // 패널 5에 기능 추가
-        Panel6Action.addFunctionality(bottomPanel); // 하단 바에 기능 추가
 
         gbc.gridx = 0;
         gbc.gridy = 0;
