@@ -1,11 +1,41 @@
-// WatchList(키워드로검색)
-curl https://newsapi.org/v2/everything -G \
-    -d q=Apple \
-    -d from=2024-01-06 \
-    -d sortBy=popularity \
-    -d apiKey=1277dcdf93f8462a96f2efd5778607ae
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>News Search</title>
+</head>
+<body>
+    <label for="searchInput">검색어: </label>
+    <input type="text" id="searchInput" placeholder="검색어를 입력하세요">
+    <button onclick="searchNews()">뉴스 검색</button>
 
-// 국가 또 는카테고리의 현재 인기 헤드라인
-curl https://newsapi.org/v2/top-headlines -G \
-    -d country=us \
-    -d apiKey=1277dcdf93f8462a96f2efd5778607ae
+    <div id="newsList"></div>
+
+    <script>
+        function searchNews() {
+            const apiKey = '1277dcdf93f8462a96f2efd5778607ae';
+            const searchInput = document.getElementById('searchInput').value;
+            const apiUrl = `https://newsapi.org/v2/everything?q=${searchInput}&apiKey=${apiKey}`;
+
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => displayNews(data.articles))
+                .catch(error => console.error('Error:', error));
+        }
+
+        function displayNews(articles) {
+            const newsList = document.getElementById('newsList');
+            newsList.innerHTML = ''; // 기존의 뉴스 목록을 지워줌
+
+            articles.forEach(article => {
+                const newsItem = document.createElement('div');
+                newsItem.innerHTML = `<h3>${article.title}</h3>
+                                      <p>${article.description}</p>
+                                      <a href="${article.url}" target="_blank">원문 보기</a>`;
+                newsList.appendChild(newsItem);
+            });
+        }
+    </script>
+</body>
+</html>
