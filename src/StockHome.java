@@ -68,6 +68,6 @@ public class StockHome {
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(Home::new);
+        //SwingUtilities.invokeLater(Home::new);
     }
 }
