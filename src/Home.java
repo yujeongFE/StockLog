@@ -79,7 +79,7 @@ class Panel3Action { // 관심주식
                 row[1] = resultSet.getObject(2);
                 row[3] = resultSet.getObject(3);
                 row[6] = resultSet.getObject(4);
-                tableModel.addRow(row);
+                // tableModel.addRow(row);
             }
 
             // 날짜 범위 설정
@@ -100,6 +100,10 @@ class Panel3Action { // 관심주식
             } else {
             }
 
+            // JLabel 생성 및 패널에 추가
+            JLabel label = new JLabel("관심 주식", SwingConstants.CENTER); // SwingConstants.CENTER로 가운데 정렬
+            panel.add(label, BorderLayout.NORTH); // BorderLayout의 NORTH 위치에 추가
+
             // 테이블 생성 및 패널에 추가
             JTable table = new JTable(tableModel);
 
@@ -109,12 +113,12 @@ class Panel3Action { // 관심주식
             // JScrollPane으로 테이블을 감싸기
             JScrollPane scrollPane = new JScrollPane(table);
 
-            // 패널의 레이아웃을 BorderLayout으로 설정
-            panel.setLayout(new BorderLayout());
-
-            // JScrollPane의 세로 크기를 조정하여 패널 세로 크기의 2/3로 설정
+            // JScrollPane의 세로 크기를 조    정하여 패널 세로 크기의 2/3로 설정
             Dimension panelSize = panel.getPreferredSize();
             int newScrollPaneHeight = (int) (panelSize.height * 0.66); // 2/3의 크기
+
+            System.out.println(newScrollPaneHeight);
+
             scrollPane.setPreferredSize(new Dimension(0, newScrollPaneHeight)); // 가로 크기는 자동으로 조정됨
 
             // 패널에 JScrollPane 추가
@@ -199,17 +203,15 @@ class Panel3Action { // 관심주식
 
         // 출력 행 구성
 
-        for (int i = 0; i < itemList.getLength(); i++) {
-            Node itemNode = itemList.item(i);
+            Node itemNode = itemList.item(0);
             if (itemNode.getNodeType() == Node.ELEMENT_NODE) {
                 Element itemElement = (Element) itemNode;
-
                 row[2] = getValue("clpr", itemElement);
                 row[4] = getValue("vs", itemElement);
                 row[5] = getValue("fltRt", itemElement);
                 tableModel.addRow(row);
             }
-        }
+
     }
     private static String getValue(String tag, Element element) {
         NodeList nodeList = element.getElementsByTagName(tag).item(0).getChildNodes();
