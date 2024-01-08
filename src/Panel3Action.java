@@ -1,50 +1,28 @@
-import javax.swing.*;
-import javax.swing.border.Border;
-import java.awt.*;
-
-// 패널 3
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import java.io.UnsupportedEncodingException;
-import java.sql.*;
-import javax.swing.table.*;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-
-// 패널 3.2
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import java.awt.*;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Scanner;
 
-// 패널 1에 대한 동작을 처리하는 클래스
-class Panel1Action { // 종목 지수
-    public static void addFunctionality(JPanel panel) {
-        // 패널 1에 추가할 기능 구현
-    }
-}
-
-// 패널 2에 대한 동작을 처리하는 클래스
-class Panel2Action { // 매도주식
-    public static void addFunctionality(JPanel panel) {
-        // 패널 2에 추가할 기능 구현
-
-    }
-}
-
-/*// 패널 3에 대한 동작을 처리하는 클래스
+// 패널 3에 대한 동작을 처리하는 클래스
 class Panel3Action { // 관심주식
     static Object[] row = new Object[7];
     // 데이터를 담을 테이블 모델 생성
@@ -203,137 +181,19 @@ class Panel3Action { // 관심주식
 
         // 출력 행 구성
 
-            Node itemNode = itemList.item(0);
-            if (itemNode.getNodeType() == Node.ELEMENT_NODE) {
-                Element itemElement = (Element) itemNode;
-                row[2] = getValue("clpr", itemElement);
-                row[4] = getValue("vs", itemElement);
-                row[5] = getValue("fltRt", itemElement);
-                tableModel.addRow(row);
-            }
+        Node itemNode = itemList.item(0);
+        if (itemNode.getNodeType() == Node.ELEMENT_NODE) {
+            Element itemElement = (Element) itemNode;
+            row[2] = getValue("clpr", itemElement);
+            row[4] = getValue("vs", itemElement);
+            row[5] = getValue("fltRt", itemElement);
+            tableModel.addRow(row);
+        }
 
     }
     private static String getValue(String tag, Element element) {
         NodeList nodeList = element.getElementsByTagName(tag).item(0).getChildNodes();
         Node node = nodeList.item(0);
         return node.getNodeValue();
-    }
-}*/
-
-// 패널 4에 대한 동작을 처리하는 클래스
-class Panel4Action { // 매도주식
-    public static void addFunctionality(JPanel panel) {
-        // 패널 4에 추가할 기능 구현
-    }
-}
-
-// 패널 5에 대한 동작을 처리하는 클래스
-class Panel5Action { // 매도주식
-    public static void addFunctionality(JPanel panel) {
-        // 패널 5에 추가할 기능 구현
-    }
-}
-
-// 하단바에 대한 동작을 처리하는 클래스
-class Panel6Action { // 매도주식
-    public static void addFunctionality(JPanel panel) {
-        // 하단바에 추가할 기능 구현
-    }
-}
-
-
-
-public class Home {
-    static String userId; // 사용자 id 저장 변수 추가
-
-    public Home(String userId) {
-        this.userId = userId;
-
-        JFrame frame = new JFrame("주식 매매 관리 시스템");
-
-        JPanel mainPanel = new JPanel(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-
-        JPanel topLeftPanel = createPanelWithBorder("1"); // 종목지수
-        JPanel topRightPanel = createPanelWithBorder("2"); // 매도주식
-        JPanel bottomLeftPanel = createPanelWithBorder("3"); // 관심주식
-        JPanel bottomRightPanel = createPanelWithBorder("4"); // 보유주식
-        JPanel rightPanel = createPanelWithBorder("5");
-
-        JPanel bottomPanel = new JPanel(); // 하단바
-        bottomPanel.setBackground(Color.GRAY); // 배경색 회색
-        bottomPanel.setPreferredSize(new Dimension(frame.getWidth(), 50)); // 높이 50px
-
-        frame.add(bottomPanel, BorderLayout.SOUTH);
-
-        // 패널에 기능 추가
-        Panel1Action.addFunctionality(topLeftPanel); // 패널 1에 기능 추가
-        Panel2Action.addFunctionality(topRightPanel); // 패널 2에 기능 추가
-        Panel3Action.addFunctionality(bottomLeftPanel, userId); // 관심 주식 표시
-        Panel4Action.addFunctionality(bottomRightPanel); // 패널 4에 기능 추가
-        Panel5Action.addFunctionality(rightPanel); // 패널 5에 기능 추가
-        Panel6Action.addFunctionality(bottomPanel); // 하단 바에 기능 추가
-
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.weightx = 1.0; // gbc.weightx = 1.0;은 해당 컴포넌트가 그리드의 가로 방향으로 가능한 최대 공간을 차지
-        gbc.weighty = 1.0;
-        gbc.fill = GridBagConstraints.BOTH; // 가로 및 세로 방향으로 모두 공간을 채움 // fill 속성은 해당 컴포넌트가 할당받은 공간을 어떻게 채울지를 지정
-        mainPanel.add(topLeftPanel, gbc);
-
-        gbc.gridx = 1;
-        gbc.gridy = 0;
-        mainPanel.add(topRightPanel, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        mainPanel.add(bottomLeftPanel, gbc);
-
-        gbc.gridx = 1;
-        gbc.gridy = 1;
-
-        mainPanel.add(bottomRightPanel, gbc);
-
-        gbc.gridx = 2;
-        gbc.gridy = 0;
-        gbc.gridheight = 2;
-        gbc.fill = GridBagConstraints.BOTH; // 가로 및 세로 방향으로 모두 공간을 채움
-        mainPanel.add(rightPanel, gbc);
-
-        frame.add(mainPanel);
-        frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setVisible(true);
-
-    }
-
-    /*// 3패널 가져오기
-    public JPanel getBottomLeftPanel() {
-        return bottomLeftPanel;
-    }*/
-
-    private JPanel createPanelWithBorder(String text) {
-        JPanel panel = new JPanel(new BorderLayout());
-        JLabel label = new JLabel(text, SwingConstants.CENTER);
-        panel.add(label, BorderLayout.CENTER);
-
-        // 테두리 스타일 지정
-        Border border = BorderFactory.createLineBorder(Color.BLACK);
-        panel.setBorder(BorderFactory.createCompoundBorder(border, BorderFactory.createEmptyBorder(10, 10, 10, 10)));
-
-        return panel;
-    }
-
-
-    public static void main(String[] args) {
-        DBconnection dbConnector = new DBconnection();
-        SwingUtilities.invokeLater(() -> {
-            Home home = new Home(userId);
-
-            //
-            /*PanelAction panel3Action = new PanelAction();
-            JPanel bottomLeftPanel = home.getBottomLeftPanel(); // Home 클래스의 bottomLeftPanel 가져오기*/
-
-        });
     }
 }
