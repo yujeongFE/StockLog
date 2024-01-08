@@ -281,11 +281,12 @@ public class LoginSignin {
                         ResultSet resultSet = statement.executeQuery(query);
 
                         if (resultSet.next()) {
+                            String userId = id; // 이 부분에서 아이디 저장
                             JOptionPane.showMessageDialog(loginFrame, id + "님 로그인에 성공하셨습니다.");
 
                             loginFrame.dispose(); // 로그인 창 닫기
                             SwingUtilities.invokeLater(() -> {
-                                new Home(); // 홈 화면 열기
+                                new Home(userId); // 홈 화면 열기
                             });
                         } else {
                             JOptionPane.showMessageDialog(loginFrame, "로그인에 실패했습니다. 회원이 아니시면 회원가입을 진행해주세요.");

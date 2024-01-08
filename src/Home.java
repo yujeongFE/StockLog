@@ -1,12 +1,17 @@
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
-import java.awt.event.*;
-import java.sql.*;
 
 // 패널 3
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.text.*;
+import java.awt.event.*;
+import java.sql.*;
+import javax.swing.table.*;
+import javax.swing.JScrollPane;
+import javax.swing.JLabel;
+import javax.swing.JTable;
 
 // 패널 1에 대한 동작을 처리하는 클래스
 class Panel1Action { // 종목 지수
@@ -24,112 +29,68 @@ class Panel2Action { // 매도주식
 }
 
 // 패널 3에 대한 동작을 처리하는 클래스
-/*
-public class Panel3Action { // 관심주식
-    static DBconnection dbConnector = new DBconnection(); // DB 연결 객체 생성
+class Panel3Action { // 관심주식
+    public static void addFunctionality(JPanel panel, String userId) {
+        // 데이터베이스 연결
+        DBconnection dbConnector = new DBconnection();
+        Connection connection = dbConnector.getConnection();
 
-    // DB에서 관심 있는 주식을 가져와서 UI에 표시하는 로직
-
-    private DefaultTableModel model;
-    public static void displayInterestedStocks(Home home, DBconnection dbConnector) {
-
-        // DB에서 가져오는 정보 NAME, CODE, CATEGORY, MEMO
-        JPanel bottomLeftPanel = home.getBottomLeftPanel(); // Home 클래스의 getter 메서드로 bottomLeftPanel을 가져옵니다.
+        String id = userId;
+        // SQL 쿼리 실행
+        String query = "SELECT s.NAME, s.CODE, i.CATEGORY, i.MEMO FROM stock s, interest i WHERE s.CODE = i.CODE AND U_ID = '" + id + "'";
         try {
-            Statement statement = dbConnector.getConnection().createStatement();
-            String query = "SELECT s.NAME, s.CODE, i.CATEGORY, i.MEMO FROM stock s, interest i WHERE s.NAME = i.NAME AND U_ID = 'id'";
+            Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(query);
 
-            JTable stockTable = createStockTable(resultSet); // ResultSet에서 JTable 생성
-            JScrollPane scrollPane = new JScrollPane(stockTable);
+            // 데이터를 담을 테이블 모델 생성
+            DefaultTableModel tableModel = new DefaultTableModel();
 
-            bottomLeftPanel.add(scrollPane); // 생성된 JTable을 패널에 추가
-            bottomLeftPanel.revalidate(); // 패널을 갱신하여 변경 사항을 반영
+            // 원하는 컬럼 순서와 이름을 추가
+            tableModel.addColumn("종목명");
+            tableModel.addColumn("종목코드");
+            // tableModel.addColumn("현재주가");
+            tableModel.addColumn("종류");
+            // tableModel.addColumn("전일대비등락");
+            // tableModel.addColumn("전일대비등락비");
+            tableModel.addColumn("메모");
+
+            // 결과셋의 데이터를 테이블 모델에 추가
+            while (resultSet.next()) {
+                Object[] row = new Object[4];
+                for (int i = 0; i < 4; i++) {
+                    row[i] = resultSet.getObject(i + 1);
+                }
+                tableModel.addRow(row);
+            }
+
+            // 테이블 생성 및 패널에 추가
+            JTable table = new JTable(tableModel);
+
+            // 테이블 크기 조정
+            table.setPreferredScrollableViewportSize(table.getPreferredSize());
+
+            // JScrollPane으로 테이블을 감싸기
+            JScrollPane scrollPane = new JScrollPane(table);
+
+            // 패널의 레이아웃을 BorderLayout으로 설정
+            panel.setLayout(new BorderLayout());
+
+            // JScrollPane의 세로 크기를 조정하여 패널 세로 크기의 2/3로 설정
+            Dimension panelSize = panel.getPreferredSize();
+            int newScrollPaneHeight = (int) (panelSize.height * 0.66); // 2/3의 크기
+            scrollPane.setPreferredSize(new Dimension(0, newScrollPaneHeight)); // 가로 크기는 자동으로 조정됨
+
+            // 패널에 JScrollPane 추가
+            panel.add(scrollPane, BorderLayout.CENTER);
 
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            // 연결 닫기
+            dbConnector.closeConnection();
         }
-
-        */
-/*//*
-/ model 컬럼명 생성성
-        String[] columnName = { "종목명", "종목코드", "현재주가", "종류", "전일대비등락", "전일대비등락비", "메모"}; // 보유 여부는 나중에
-
-        // 내부 컬럼 데이터 생성 [가져온 DB에 데이터 사이즈][컬럼 개수]
-        String[][] rowData = new String[list.size()][columnName.length];
-        for (int row = 0; row < rowData.length; row++) {
-            rowData[row][0] = list.get(row).getNAME();
-            rowData[row][1] = list.get(row).getCODE();
-            rowData[row][2] = list.get(row).getKind_name(); // 현재 주가
-            rowData[row][3] = list.get(row).getItem_name(); // 종류
-            rowData[row][4] = Integer.toString(list.get(row).getPrice()); // 전일대비 등락
-            rowData[row][5] = list.get(row).getQuantity(); // 전일대비등락비
-            rowData[row][6] = list.get(row).getMEMO();
-        } // end for
-
-        // 모델 만들고 JTable에 모델 입력
-        model = new DefaultTableModel(rowData, columnName);
-        table = new JTable(model);
-        scrollPane.setViewportView(table);*//*
-
-
-        // 데이터베이스에서 목록을 가져와서 리스트에 추가
-        // 쿼리 실행
-
-        // 결과 처리
-
-        // 리소스 해제
-
-    }
-
-    private static JTable createStockTable(ResultSet resultSet) throws SQLException {
-        ResultSetMetaData metaData = resultSet.getMetaData();
-        int columnCount = metaData.getColumnCount();
-
-        DefaultTableModel tableModel = new DefaultTableModel();
-        for (int columnIndex = 1; columnIndex <= columnCount; columnIndex++) {
-            tableModel.addColumn(metaData.getColumnLabel(columnIndex));
-        }
-
-        while (resultSet.next()) {
-            Object[] rowData = new Object[columnCount];
-            for (int i = 0; i < columnCount; i++) {
-                rowData[i] = resultSet.getObject(i + 1);
-            }
-            tableModel.addRow(rowData);
-        }
-
-        return new JTable(tableModel);
-    }
-
-    public static void searchAndAddStock(JPanel panel) {
-        JLabel stock_search = new JLabel("주식 검색 : ");
-        JTextField text = new JTextField(15);
-
-        JButton searchButton = new JButton("관심 주식 추가하기");
-
-        searchButton.addActionListener(e -> {
-            String stockName = text.getText();
-            // 주식을 검색하고 DB에 추가하는 로직
-            // boolean added = dbConnector.addStock(stockName); // 주식을 DB에 추가
-
-            */
-/*if (added) {
-                JOptionPane.showMessageDialog(panel, "주식이 성공적으로 추가되었습니다.");
-                // 추가되었으면 해당 주식을 UI에 추가하는 작업을 수행할 수 있음
-                // displayInterestedStocks(panel); // 추가된 주식을 다시 UI에 표시할 수 있음 (선택적)
-            } else {
-                JOptionPane.showMessageDialog(panel, "주식 추가에 실패했습니다.");
-            }*//*
-
-        });
-
-        panel.add(stock_search);
-        panel.add(text);
-        panel.add(searchButton);
     }
 }
-*/
 
 // 패널 4에 대한 동작을 처리하는 클래스
 class Panel4Action { // 매도주식
@@ -155,8 +116,10 @@ class Panel6Action { // 매도주식
 
 
 public class Home {
-    private JPanel bottomLeftPanel; // bottomLeftPanel 필드 추가
-    public Home() {
+    static String userId; // 사용자 id 저장 변수 추가
+
+    public Home(String userId) {
+        this.userId = userId;
 
         JFrame frame = new JFrame("주식 매매 관리 시스템");
 
@@ -165,7 +128,7 @@ public class Home {
 
         JPanel topLeftPanel = createPanelWithBorder("1"); // 종목지수
         JPanel topRightPanel = createPanelWithBorder("2"); // 매도주식
-        bottomLeftPanel = createPanelWithBorder("3"); // 관심주식
+        JPanel bottomLeftPanel = createPanelWithBorder("3"); // 관심주식
         JPanel bottomRightPanel = createPanelWithBorder("4"); // 보유주식
         JPanel rightPanel = createPanelWithBorder("5");
 
@@ -178,10 +141,7 @@ public class Home {
         // 패널에 기능 추가
         Panel1Action.addFunctionality(topLeftPanel); // 패널 1에 기능 추가
         Panel2Action.addFunctionality(topRightPanel); // 패널 2에 기능 추가
-        // 패널 3에 기능 추가
-        // Panel3Action.displayInterestedStocks(bottomLeftPanel); // 관심 주식 표시
-        new Panel3Action();
-
+        Panel3Action.addFunctionality(bottomLeftPanel, userId); // 관심 주식 표시
         Panel4Action.addFunctionality(bottomRightPanel); // 패널 4에 기능 추가
         Panel5Action.addFunctionality(rightPanel); // 패널 5에 기능 추가
         Panel6Action.addFunctionality(bottomPanel); // 하단 바에 기능 추가
@@ -219,10 +179,10 @@ public class Home {
 
     }
 
-    // 3패널 가져오기
+    /*// 3패널 가져오기
     public JPanel getBottomLeftPanel() {
         return bottomLeftPanel;
-    }
+    }*/
 
     private JPanel createPanelWithBorder(String text) {
         JPanel panel = new JPanel(new BorderLayout());
@@ -240,10 +200,11 @@ public class Home {
     public static void main(String[] args) {
         DBconnection dbConnector = new DBconnection();
         SwingUtilities.invokeLater(() -> {
-            Home home = new Home();
-            Panel3Action panel3Action = new Panel3Action();
+            Home home = new Home(userId);
 
-            JPanel bottomLeftPanel = home.getBottomLeftPanel(); // Home 클래스의 bottomLeftPanel 가져오기
+            //
+            /*PanelAction panel3Action = new PanelAction();
+            JPanel bottomLeftPanel = home.getBottomLeftPanel(); // Home 클래스의 bottomLeftPanel 가져오기*/
 
         });
     }
