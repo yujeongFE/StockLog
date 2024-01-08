@@ -4,18 +4,15 @@ import java.sql.*;
 
 // 패널 3
 import java.awt.*;
-import java.util.*;
 import java.awt.event.*;
 import java.sql.Statement;
 import java.util.Vector;
 import javax.swing.table.*;
 import javax.swing.JScrollPane;
 import javax.swing.JLabel;
-import javax.swing.JTextField;
-import javax.swing.JButton;
 import javax.swing.JTable;
 
-public class Panel3Action extends JFrame{ // 관심주식
+public class PanelAction extends JFrame{ // 관심주식
     DBconnection dbConnector = new DBconnection(); // DB 연결 객체 생성
     Statement statement; // sql
     PreparedStatement prestat; // sql 준비
@@ -29,7 +26,7 @@ public class Panel3Action extends JFrame{ // 관심주식
     DefaultTableModel model; // table 상으로 db 모델 불러옴
 
     static String id; // 받아온 id
-    public Panel3Action(){
+    public PanelAction(){
         makeGUI(); // 화면 구성
         // prepareDB(); // db 준비작업
         display(null); // 첫화면에서 테이블의 모든 내용 보여주기 위해 select하는 함수
