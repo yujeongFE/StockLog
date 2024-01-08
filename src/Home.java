@@ -87,14 +87,17 @@ class Panel3Action { // 관심주식
             String frdt = dateRange[0];
             String todt = dateRange[1];
 
-            // 종목명을 URL 인코딩하여 API 호출
-            StringBuffer stockPriceData = getStockPrice(URLEncoder.encode(stockName, "UTF-8"), frdt, todt);
+            if(stockName != null){
+                // 종목명을 URL 인코딩하여 API 호출
+                StringBuffer stockPriceData = getStockPrice(URLEncoder.encode(stockName, "UTF-8"), frdt, todt);
 
-            if (stockPriceData.length() > 0) {
-                // 데이터 파싱 및 표로 정리하여 출력
-                printStockPriceTable(stockPriceData);
+                if (stockPriceData.length() > 0) {
+                    // 데이터 파싱 및 표로 정리하여 출력
+                    printStockPriceTable(stockPriceData);
+                } else {
+                    System.out.println("No stock price data available for the specified parameters.");
+                }
             } else {
-                System.out.println("No stock price data available for the specified parameters.");
             }
 
             // 테이블 생성 및 패널에 추가
@@ -195,7 +198,7 @@ class Panel3Action { // 관심주식
         NodeList itemList = doc.getElementsByTagName("item");
 
         // 출력 행 구성
-        
+
         for (int i = 0; i < itemList.getLength(); i++) {
             Node itemNode = itemList.item(i);
             if (itemNode.getNodeType() == Node.ELEMENT_NODE) {
