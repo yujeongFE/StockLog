@@ -6,6 +6,7 @@ import java.sql.*;
 
 public class LoginSignin {
     // phone number(tel) format
+    static String id; // id static
     private static MaskFormatter createFormatter(String s) {
         MaskFormatter formatter = null;
         try {
@@ -156,6 +157,8 @@ public class LoginSignin {
                             try {
                                 Statement statement = dbConnector.getConnection().createStatement();
                                 String query = "INSERT INTO person(U_ID, U_PS, U_NAME, U_TEL) VALUES('" + id + "', '" + passwd + "', '" + name + "', '" + tel + "')";
+                                // String query = "INSERT INTO person(U_ID, U_PS, U_NAME, U_TEL) VALUES('id', 'passwd', 'name', 'tel')";
+
                                 statement.executeUpdate(query);
                                 statement.close();
 
