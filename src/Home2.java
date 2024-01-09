@@ -18,6 +18,8 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.BorderFactory;
 
+import javax.swing.JFrame;
+import javax.swing.JLabel;
 
 // 패널 1에 대한 동작을 처리하는 클래스
 class PanelAction1 { // 종목 지수
@@ -27,11 +29,11 @@ class PanelAction1 { // 종목 지수
 }
 
 // 패널 2에 대한 동작을 처리하는 클래스
-class PanelAction2 { // 매도주식
+/* class H2_PanelAction2 { // 매도주식
     public static void addFunctionality(JPanel panel) {
         // 패널 2에 추가할 기능 구현
     }
-}
+} */
 
 class PanelAction2_1 { // 매도주식
     public static void addFunctionality(JPanel panel) {
@@ -54,150 +56,13 @@ class PanelAction4 { // 매도주식
 }
 
 // 패널 5에 대한 동작을 처리하는 클래스
-class PanelAction5 { // 매도주식
-    private static JButton searchButton;
-    private static JTextArea newsTextArea;
+// H2_PanelAction5.java 에 있습니다.
 
-    public static void addFunctionality(JPanel panel) {
-        // 패널 5에 추가할 기능 구현
-        searchButton = new JButton("검색");
 
-        searchButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String userInterestStock = JOptionPane.showInputDialog("Enter the stock you are interested in:");
-                if (userInterestStock != null && !userInterestStock.isEmpty()) {
-                    performNewsSearch(userInterestStock, panel);
-                } else {
-                    JOptionPane.showMessageDialog(null, "Please enter a valid stock symbol.");
-                }
-            }
-        });
-
-        newsTextArea = new JTextArea();
-        newsTextArea.setEditable(false);  // 편집 불가능하도록 설정
-
-    // 패널에 레이아웃을 BorderLayout으로 설정
-        panel.setLayout(new BorderLayout());
-
-    // 패널에 검색 버튼 추가
-        panel.add(searchButton, BorderLayout.NORTH);
-
-    // JScrollPane을 생성하고 JTextArea를 넣어줌
-        JScrollPane scrollPane = new JScrollPane(newsTextArea);
-
-    // 패널의 가운데 영역에 JScrollPane 추가
-        panel.add(scrollPane, BorderLayout.CENTER);
-    }
-    private static void performNewsSearch(String userInterestStock, JPanel panel) {
-        String apiKey = "1277dcdf93f8462a96f2efd5778607ae";
-        String apiUrl = "https://newsapi.org/v2/everything?q=" + userInterestStock + "&apiKey=" + apiKey;
-
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    URL url = new URL(apiUrl);
-                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                    connection.setRequestMethod("GET");
-
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                    String line;
-                    StringBuilder response = new StringBuilder();
-
-                    while ((line = reader.readLine()) != null) {
-                        response.append(line);
-                    }
-
-                    reader.close();
-                    connection.disconnect();
-
-                    // JTextArea에 뉴스 정보 설정
-                    newsTextArea.setText(response.toString());
-
-                    // 패널을 다시 그리도록 갱신
-                    panel.revalidate();
-                    panel.repaint();
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-            }
-        });
-    }
-}
 
 // 패널 5-1에 대한 동작을 처리하는 클래스
-class PanelAction5_1 {
-    private static JButton searchButton;
-    private static JTextArea newsTextArea;
+// H2_PanelAction5_1.java 에 있습니다.
 
-    public static void addFunctionality(JPanel panel, JPanel bottomLeftPanel) {
-        searchButton = new JButton("검색");
-
-        searchButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String userInterestStock = JOptionPane.showInputDialog("Enter the stock you are interested in:");
-                if (userInterestStock != null && !userInterestStock.isEmpty()) {
-                    performNewsSearch(userInterestStock, bottomLeftPanel);
-                } else {
-                    JOptionPane.showMessageDialog(null, "Please enter a valid stock symbol.");
-                }
-            }
-        });
-
-        newsTextArea = new JTextArea();
-        newsTextArea.setEditable(false);  // 편집 불가능하도록 설정
-
-        // 패널에 레이아웃을 BorderLayout으로 설정
-        panel.setLayout(new BorderLayout());
-
-        // 패널에 검색 버튼 추가
-        panel.add(searchButton, BorderLayout.NORTH);
-
-        // JScrollPane을 생성하고 JTextArea를 넣어줌
-        JScrollPane scrollPane = new JScrollPane(newsTextArea);
-
-        // 패널의 가운데 영역에 JScrollPane 추가
-        panel.add(scrollPane, BorderLayout.CENTER);
-    }
-
-    private static void performNewsSearch(String userInterestStock, JPanel bottomLeftPanel) {
-        String apiKey = "1277dcdf93f8462a96f2efd5778607ae";
-        String apiUrl = "https://newsapi.org/v2/everything?q=" + userInterestStock + "&apiKey=" + apiKey;
-
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    URL url = new URL(apiUrl);
-                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                    connection.setRequestMethod("GET");
-
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                    String line;
-                    StringBuilder response = new StringBuilder();
-
-                    while ((line = reader.readLine()) != null) {
-                        response.append(line);
-                    }
-
-                    reader.close();
-                    connection.disconnect();
-
-                    // JTextArea에 뉴스 정보 설정
-                    newsTextArea.setText(response.toString());
-
-                    // 패널을 다시 그리도록 갱신
-                    bottomLeftPanel.revalidate();
-                    bottomLeftPanel.repaint();
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-            }
-        });
-    }
-}
 
 // 패널 6에 대한 동작을 처리하는 클래스
 class PanelAction6 { // 매도주식
@@ -242,15 +107,16 @@ public class Home2 {
 
         // 패널에 기능 추가
         PanelAction1.addFunctionality(topLeftPanel); // 패널 1에 기능 추가
-        PanelAction2.addFunctionality(topRightPanel1); // 패널 2에 기능 추가
+        //H2_PanelAction2.addFunctionality(topRightPanel1); // 패널 2에 기능 추가
         PanelAction2_1.addFunctionality(topRightPanel2); // 패널 2-1에 기능 추가
         PanelAction3.addFunctionality(rightBottomPanel); // 패널 3에 기능 추가
         PanelAction4.addFunctionality(bottomRightPanel); // 패널 4에 기능 추가
-        PanelAction5.addFunctionality(rightPanel1); // 패널 5에 기능 추가
+        H2_PanelAction5.addFunctionality(rightPanel1); // 패널 5에 기능 추가
+        // PanelAction5.addFunctionality(rightPanel1);
         PanelAction6.addFunctionality(bottomPanel); // 하단 바에 기능 추가
 
         // 패널 5-1에 기능 추가
-        PanelAction5_1.addFunctionality(rightPanel2, bottomLeftPanel);
+        H2_PanelAction5_1.addFunctionality(rightPanel2, bottomLeftPanel);
 
         gbc.gridx = 0;
         gbc.gridy = 0;
