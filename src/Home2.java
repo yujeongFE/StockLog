@@ -1,11 +1,14 @@
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
-
-// 패널 3
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.ScrollPaneConstants;
 
 // 패널 1에 대한 동작을 처리하는 클래스
 class PanelAction1 { // 종목 지수
@@ -18,14 +21,12 @@ class PanelAction1 { // 종목 지수
 class PanelAction2 { // 매도주식
     public static void addFunctionality(JPanel panel) {
         // 패널 2에 추가할 기능 구현
-
     }
 }
 
 class PanelAction2_1 { // 매도주식
     public static void addFunctionality(JPanel panel) {
         // 패널 2에 추가할 기능 구현
-
     }
 }
 
@@ -53,6 +54,53 @@ class PanelAction5 { // 매도주식
 class PanelAction5_1 { // 매도주식
     public static void addFunctionality(JPanel panel) {
         // 패널 5-1에 추가할 기능 구현
+        // NewsAPI에서 발급받은 API 키
+        String apiKey = "1277dcdf93f8462a96f2efd5778607ae";
+
+        // 사용자로부터 검색할 키워드를 입력 받음
+        String keyword = JOptionPane.showInputDialog("Enter the keyword to search for news:");
+
+        // NewsAPI에서 뉴스를 검색하기 위한 API URL
+        String apiUrl = "https://newsapi.org/v2/everything?q=" + keyword + "&apiKey=" + apiKey;
+
+        try {
+            // URL 객체 생성
+            URL url = new URL(apiUrl);
+
+            // HTTP 연결 객체 생성
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+
+            // 응답 코드 확인
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                // 연결이 성공하면 응답 데이터를 읽음
+                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                String line;
+                StringBuilder response = new StringBuilder();
+
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+                reader.close();
+
+                // 응답 데이터를 JTextArea에 추가
+                JTextArea textArea = new JTextArea(response.toString());
+                textArea.setEditable(false); // 읽기 전용으로 설정
+
+                // JScrollPane을 사용하여 텍스트 영역이 넘칠 경우 스크롤 가능하도록 함
+                JScrollPane scrollPane = new JScrollPane(textArea);
+                scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+
+                // 패널에 추가
+                panel.add(scrollPane);
+            } else {
+                // 응답이 HTTP_OK가 아닌 경우 에러 메시지 출력 또는 다른 처리 수행
+                System.out.println("HTTP Response Code: " + responseCode);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
 
@@ -65,8 +113,8 @@ class PanelAction6 { // 매도주식
 
 public class Home2 {
     private JPanel bottomLeftPanel; // bottomLeftPanel 필드 추가
-    public Home2() {
 
+    public Home2() {
         JFrame frame = new JFrame("주식 매매 관리 시스템");
 
         JPanel mainPanel = new JPanel(new GridBagLayout());
@@ -101,12 +149,13 @@ public class Home2 {
         PanelAction1.addFunctionality(topLeftPanel); // 패널 1에 기능 추가
         PanelAction2.addFunctionality(topRightPanel1); // 패널 2에 기능 추가
         PanelAction2_1.addFunctionality(topRightPanel2); // 패널 2-1에 기능 추가
-        // 패널 3에 기능 추가
         PanelAction3.addFunctionality(rightBottomPanel); // 패널 3에 기능 추가
         PanelAction4.addFunctionality(bottomRightPanel); // 패널 4에 기능 추가
         PanelAction5.addFunctionality(rightPanel1); // 패널 5에 기능 추가
-        PanelAction5_1.addFunctionality(rightPanel2); // 패널 5-1에 기능 추가
         PanelAction6.addFunctionality(bottomPanel); // 하단 바에 기능 추가
+
+        // 패널 5-1에 기능 추가
+        PanelAction5_1.addFunctionality(rightPanel2);
 
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -167,7 +216,6 @@ public class Home2 {
         SwingUtilities.invokeLater(() -> {
             try {
                 Home2 home2 = new Home2();
-
             } catch (Exception e) {
                 e.printStackTrace();
             }
