@@ -220,13 +220,6 @@ class Panel3Action { // 관심주식
     }
 }*/
 
-// 패널 4에 대한 동작을 처리하는 클래스
-class Panel4Action { // 매도주식
-    public static void addFunctionality(JPanel panel) {
-        // 패널 4에 추가할 기능 구현
-    }
-}
-
 /* // 패널 5에 대한 동작을 처리하는 클래스
 class Panel5Action { // 매도주식
     static Object[] row = new Object[8];
@@ -440,7 +433,7 @@ public class Home {
         Panel1Action.addFunctionality(topLeftPanel); // 패널 1에 기능 추가
         Panel2Action.addFunctionality(topRightPanel); // 패널 2에 기능 추가
         Panel3Action.addFunctionality(bottomLeftPanel, userId); // 관심 주식 표시
-        Panel4Action.addFunctionality(bottomRightPanel); // 패널 4에 기능 추가
+        Panel4Action.addFunctionality(bottomRightPanel, userId); // 패널 4에 기능 추가
         Panel5Action.addFunctionality(rightPanel, userId); // 패널 5에 기능 추가
         Panel6Action.addFunctionality(bottomPanel); // 하단 바에 기능 추가
 
