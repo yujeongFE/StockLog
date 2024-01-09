@@ -10,12 +10,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-
 import javax.swing.SwingUtilities;
 
-class H2_PanelAction5 { 
+class H2_PanelAction5 {
     private static JButton searchButton;
     private static JTextArea newsTextArea;
+
 
     public static void addFunctionality(JPanel panel) {
         // 패널 5에 추가할 기능 구현
@@ -52,6 +52,16 @@ class H2_PanelAction5 {
 
         // 패널의 가운데 영역에 JScrollPane 추가
         panel.add(scrollPane, BorderLayout.CENTER);
+
+        // JTextArea의 높이를 현재 높이의 절반으로 설정 (크기 조절)
+        Dimension size = newsTextArea.getPreferredSize();
+        size.height = size.height / 2;  // 현재 높이의 절반
+        newsTextArea.setPreferredSize(size);
+
+        // 패널의 크기를 현재 크기의 1/3로 설정 (가로 크기 조절)
+        Dimension panelSize = panel.getPreferredSize();
+        panelSize.width = panelSize.width / 3;  // 현재 가로 크기의 1/3
+        panel.setPreferredSize(panelSize);
     }
     private static void performNewsSearch(String userInterestStock, JPanel panel) {
         String apiKey = "1277dcdf93f8462a96f2efd5778607ae";
@@ -87,13 +97,17 @@ class H2_PanelAction5 {
                     // 패널을 다시 그리도록 갱신
                     panel.revalidate();
                     panel.repaint();
-                }   catch (IOException ex) { // IOException 추가
-                        ex.printStackTrace();
+                } catch (IOException ex) { // IOException 추가
+                    ex.printStackTrace();
+                    // 사용자에게 알림
+                    JOptionPane.showMessageDialog(null, "Error: Unable to fetch news data. Please check your internet connection.");
 
                 } catch (Exception ex) {
                     ex.printStackTrace();
+                    // 사용자에게 알림
+                    JOptionPane.showMessageDialog(null, "An unexpected error occurred. Please try again later.");
                 }
             }
         });
     }
-}
+};
