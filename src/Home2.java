@@ -1,16 +1,20 @@
 import javax.swing.*;
-import javax.swing.border.Border;
 import java.awt.*;
+import javax.swing.border.Border;
 
-// 패널 5-1
+// 패널 5-1 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.BorderFactory;
+
 
 // 패널 1에 대한 동작을 처리하는 클래스
 class PanelAction1 { // 종목 지수
@@ -53,71 +57,87 @@ class PanelAction5 { // 매도주식
     }
 }
 
-class PanelAction5_1 { // 매도주식
-    public static void addFunctionality(JPanel panel) {
-        // 패널 5-1에 추가할 기능 구현
-        // NewsAPI에서 발급받은 API 키
-        String apiKey = "1277dcdf93f8462a96f2efd5778607ae";
+// 패널 5-1에 대한 동작을 처리하는 클래스
+class PanelAction5_1 {
+    private static JButton searchButton;
 
-        // 사용자로부터 검색할 키워드를 입력 받음
-        String keyword = JOptionPane.showInputDialog("Enter the keyword to search for news:");
+    public static void addFunctionality(JPanel panel, JPanel bottomLeftPanel) {
 
-        // NewsAPI에서 뉴스를 검색하기 위한 API URL
-        String apiUrl = "https://newsapi.org/v2/everything?q=" + keyword + "&apiKey=" + apiKey;
 
-        try {
-            // URL 객체 생성
-            URL url = new URL(apiUrl);
+        searchButton = new JButton("검색");
 
-            // HTTP 연결 객체 생성
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
-
-            // 응답 코드 확인
-            int responseCode = connection.getResponseCode();
-            if (responseCode == HttpURLConnection.HTTP_OK) {
-                // 연결이 성공하면 응답 데이터를 읽음
-                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                String line;
-                StringBuilder response = new StringBuilder();
-
-                while ((line = reader.readLine()) != null) {
-                    response.append(line);
+        // GridBagConstraints를 이용하여 위치 조정
+        panel.setLayout(new FlowLayout(FlowLayout.RIGHT));
+        panel.add(searchButton);
+        searchButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String userInterestStock = JOptionPane.showInputDialog("Enter the stock you are interested in:");
+                if (userInterestStock != null && !userInterestStock.isEmpty()) {
+                    performNewsSearch(userInterestStock, bottomLeftPanel);
+                } else {
+                    JOptionPane.showMessageDialog(null, "Please enter a valid stock symbol.");
                 }
-                reader.close();
-
-                // 응답 데이터를 JTextArea에 추가
-                JTextArea textArea = new JTextArea(response.toString());
-                textArea.setEditable(false); // 읽기 전용으로 설정
-
-                // 텍스트를 20단어씩 나누어 JTextArea에 추가
-                String[] words = response.toString().split("\\s+");
-                int wordCount = 0;
-                for (String word : words) {
-                    textArea.append(word + " ");
-                    wordCount++;
-                    if (wordCount == 20) {
-                        textArea.append("\n"); // 20단어마다 줄바꿈
-                        wordCount = 0;
-                    }
-                }
-                // JScrollPane을 사용하여 텍스트 영역이 넘칠 경우 스크롤 가능하도록 함
-                JScrollPane scrollPane = new JScrollPane(textArea);
-                scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-
-                // 패널에 추가
-                panel.add(scrollPane);
-            } else {
-                // 응답이 HTTP_OK가 아닌 경우 에러 메시지 출력 또는 다른 처리 수행
-                System.out.println("HTTP Response Code: " + responseCode);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        });
+
+        // GridBagConstraints를 이용하여 위치 조정
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 1;  // 1번째 열
+        gbc.gridy = 0;  // 0번째 행
+        gbc.anchor = GridBagConstraints.NORTHEAST;  // 우상단에 정렬
+        panel.add(searchButton, gbc);
+    }
+
+    private static void performNewsSearch(String userInterestStock, JPanel bottomLeftPanel) {
+        String apiKey = "1277dcdf93f8462a96f2efd5778607ae";
+        String apiUrl = "https://newsapi.org/v2/everything?q=" + userInterestStock + "&apiKey=" + apiKey;
+
+        // API 호출 및 결과 표시를 Swing 스레드에서 처리
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    URL url = new URL(apiUrl);
+                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                    connection.setRequestMethod("GET");
+
+                    int responseCode = connection.getResponseCode();
+                    if (responseCode == HttpURLConnection.HTTP_OK) {
+                        BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                        String line;
+                        StringBuilder response = new StringBuilder();
+
+                        while ((line = reader.readLine()) != null) {
+                            response.append(line);
+                        }
+                        reader.close();
+
+                        // JTextArea 및 JScrollPane 생성
+                        JTextArea textArea = new JTextArea(response.toString());
+                        textArea.setEditable(false);
+                        JScrollPane scrollPane = new JScrollPane(textArea);
+                        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+
+                        // 기존 패널을 모두 제거하고 결과를 추가
+                        bottomLeftPanel.removeAll();
+                        bottomLeftPanel.add(scrollPane);
+
+                        // 패널을 다시 그리도록 갱신
+                        bottomLeftPanel.revalidate();
+                        bottomLeftPanel.repaint();
+                    } else {
+                        System.out.println("HTTP Response Code: " + responseCode);
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
     }
 }
 
-// 하단바에 대한 동작을 처리하는 클래스
+// 패널 6에 대한 동작을 처리하는 클래스
 class PanelAction6 { // 매도주식
     public static void addFunctionality(JPanel panel) {
         // 하단바에 추가할 기능 구현
@@ -168,7 +188,7 @@ public class Home2 {
         PanelAction6.addFunctionality(bottomPanel); // 하단 바에 기능 추가
 
         // 패널 5-1에 기능 추가
-        PanelAction5_1.addFunctionality(rightPanel2);
+        PanelAction5_1.addFunctionality(rightPanel2, bottomLeftPanel);
 
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -225,7 +245,6 @@ public class Home2 {
     }
 
     public static void main(String[] args) {
-        DBconnection dbConnector = new DBconnection();
         SwingUtilities.invokeLater(() -> {
             try {
                 Home2 home2 = new Home2();
