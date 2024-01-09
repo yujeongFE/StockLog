@@ -1,6 +1,7 @@
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
+//패널 5-1
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
