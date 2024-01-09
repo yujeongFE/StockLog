@@ -227,12 +227,12 @@ class Panel4Action { // 매도주식
     }
 }
 
-// 패널 5에 대한 동작을 처리하는 클래스
+/* // 패널 5에 대한 동작을 처리하는 클래스
 class Panel5Action { // 매도주식
     public static void addFunctionality(JPanel panel) {
         // 패널 5에 추가할 기능 구현
     }
-}
+} */
 
 // 하단바에 대한 동작을 처리하는 클래스
 class Panel6Action { // 매도주식
