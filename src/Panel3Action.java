@@ -8,24 +8,16 @@ import javax.swing.table.DefaultTableModel;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.awt.*;
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.*;
+import java.net.*;
+import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-// 패널 3에 대한 동작을 처리하는 클래스
-class Panel3Action { // 관심주식
+class Panel3Action {
     static Object[] row = new Object[7];
-    // 데이터를 담을 테이블 모델 생성
     static DefaultTableModel tableModel = new DefaultTableModel();
 
     public static void addFunctionality(JPanel panel, String userId) {
@@ -41,23 +33,22 @@ class Panel3Action { // 관심주식
             ResultSet resultSet = statement.executeQuery(query);
 
             // 원하는 컬럼 순서와 이름을 추가
-            tableModel.addColumn("종목명"); //
-            tableModel.addColumn("종목코드"); //
+            tableModel.addColumn("종목명");
+            tableModel.addColumn("종목코드");
             tableModel.addColumn("현재주가");
-            tableModel.addColumn("시장 구분"); //
+            tableModel.addColumn("시장 구분");
             tableModel.addColumn("전일대비등락");
             tableModel.addColumn("전일대비등락비");
-            tableModel.addColumn("메모"); //
+            tableModel.addColumn("메모");
 
             // 결과셋의 데이터를 테이블 모델에 추가
-            String stockName = null; // 변수를 루프 바깥에 선언하고 초기화
+            String stockName = null;
             while (resultSet.next()) {
                 row[0] = resultSet.getObject(1);
-                stockName = resultSet.getObject(1).toString(); // Object를 String으로 변환하여 stockName에 저장
+                stockName = resultSet.getObject(1).toString();
                 row[1] = resultSet.getObject(2);
                 row[3] = resultSet.getObject(3);
                 row[6] = resultSet.getObject(4);
-                // tableModel.addRow(row);
             }
 
             // 날짜 범위 설정
@@ -65,7 +56,7 @@ class Panel3Action { // 관심주식
             String frdt = dateRange[0];
             String todt = dateRange[1];
 
-            if(stockName != null){
+            if (stockName != null) {
                 // 종목명을 URL 인코딩하여 API 호출
                 StringBuffer stockPriceData = getStockPrice(URLEncoder.encode(stockName, "UTF-8"), frdt, todt);
 
@@ -78,14 +69,22 @@ class Panel3Action { // 관심주식
             } else {
             }
 
+            // JButton 생성 및 패널에 추가
+            JButton searchButton = new JButton("관심 주식 검색");
+            searchButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    InterestStockFrame();
+                }
+            });
+            panel.add(searchButton, BorderLayout.SOUTH);  // Add the button to the SOUTH position of the panel
+
             // JLabel 생성 및 패널에 추가
-            JLabel label = new JLabel("관심 주식", SwingConstants.CENTER); // SwingConstants.CENTER로 가운데 정렬
-            panel.add(label, BorderLayout.NORTH); // BorderLayout의 NORTH 위치에 추가
+            JLabel label = new JLabel("관심 주식", SwingConstants.CENTER);
+            panel.add(label, BorderLayout.NORTH);
 
             // 테이블 생성 및 패널에 추가
             JTable table = new JTable(tableModel);
-
-            // 테이블 크기 조정
             table.setPreferredScrollableViewportSize(table.getPreferredSize());
 
             // JScrollPane으로 테이블을 감싸기
@@ -93,11 +92,9 @@ class Panel3Action { // 관심주식
 
             // JScrollPane의 세로 크기를 조정하여 패널 세로 크기의 2/3로 설정
             Dimension panelSize = panel.getPreferredSize();
-            int newScrollPaneHeight = (int) (panelSize.height * 0.66); // 2/3의 크기
+            int newScrollPaneHeight = (int) (panelSize.height * 0.66);
 
-            System.out.println(newScrollPaneHeight);
-
-            scrollPane.setPreferredSize(new Dimension(0, newScrollPaneHeight)); // 가로 크기는 자동으로 조정됨
+            scrollPane.setPreferredSize(new Dimension(0, newScrollPaneHeight));
 
             // 패널에 JScrollPane 추가
             panel.add(scrollPane, BorderLayout.CENTER);
@@ -143,7 +140,7 @@ class Panel3Action { // 관심주식
         try {
             // 외부 API 호출을 위한 URL 설정
             String urlStr = "https://api.odcloud.kr/api/GetStockSecuritiesInfoService/v1/getStockPriceInfo?";
-            urlStr += "serviceKey=" + "1%2FWP%2BVc3M5kGU2bikqOuBl9hAtMQ7OeqB24EL0llGF9zC75kdgM1jbsTy90LiI9hmDwU7jeFjW8P%2B1VPFtc%2BDg%3D%3D";  // API 키를 적절하게 설정
+            urlStr += "serviceKey=" + "1%2FWP%2BVc3M5kGU2bikqOuBl9hAtMQ7OeqB24EL0llGF9zC75kdgM1jbsTy90LiI9hmDwU7jeFjW8P%2B1VPFtc%2BDg%3D%3D";
             urlStr += "&beginBasDt=" + frdt;
             urlStr += "&endBasDt=" + todt;
             urlStr += "&itmsNm=" + likeSrtnCd;
@@ -177,23 +174,54 @@ class Panel3Action { // 관심주식
         Document doc = dBuilder.parse(input);
         doc.getDocumentElement().normalize();
 
-        NodeList itemList = doc.getElementsByTagName("item");
+        // 파싱한 XML 데이터를 표 형식으로 출력
+        NodeList nList = doc.getElementsByTagName("item");
+        for (int temp = 0; temp < nList.getLength(); temp++) {
+            Node nNode = nList.item(temp);
 
-        // 출력 행 구성
+            if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+                Element eElement = (Element) nNode;
 
-        Node itemNode = itemList.item(0);
-        if (itemNode.getNodeType() == Node.ELEMENT_NODE) {
-            Element itemElement = (Element) itemNode;
-            row[2] = getValue("clpr", itemElement);
-            row[4] = getValue("vs", itemElement);
-            row[5] = getValue("fltRt", itemElement);
-            tableModel.addRow(row);
+                String[] rowData = {
+                        eElement.getElementsByTagName("ITMS_NM").item(0).getTextContent(),
+                        eElement.getElementsByTagName("ITMS_CD").item(0).getTextContent(),
+                        eElement.getElementsByTagName("NOW_VAL").item(0).getTextContent(),
+                        eElement.getElementsByTagName("MKT_NM").item(0).getTextContent(),
+                        eElement.getElementsByTagName("FLUC_RT").item(0).getTextContent(),
+                        eElement.getElementsByTagName("FLUC_RT_YTD").item(0).getTextContent(),
+                        eElement.getElementsByTagName("MEMO").item(0).getTextContent()
+                };
+
+                tableModel.addRow(rowData);
+            }
         }
+    }
 
+    private static void InterestStockFrame() {
+        JFrame interestFrame = new JFrame("관심 주식 검색");
+        interestFrame.setLocation(200, 400);
+        JPanel panel = new JPanel();
+        panel.setLayout(new BorderLayout());
+
+
+        JPanel inputPanel = new JPanel();
+        JLabel l1 = new JLabel();
+        JTextField text = new JTextField(15);
+        JButton searchButton = new JButton("검색");
+
+
+        inputPanel.add(l1);
+        inputPanel.add(text);
+        inputPanel.add(searchButton);
+
+        panel.add(BorderLayout.CENTER, inputPanel);
+        panel.add(BorderLayout.SOUTH, new JLabel());
+
+        interestFrame.getContentPane().add(panel);
+        interestFrame.setSize(400, 400);
+        interestFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        interestFrame.setVisible(true);
+        interestFrame.setLayout(new BorderLayout());
     }
-    private static String getValue(String tag, Element element) {
-        NodeList nodeList = element.getElementsByTagName(tag).item(0).getChildNodes();
-        Node node = nodeList.item(0);
-        return node.getNodeValue();
-    }
+
 }
