@@ -4,6 +4,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -59,7 +61,7 @@ class Panel3Action { // 관심주식
             String frdt = dateRange[0];
             String todt = dateRange[1];
 
-            if(stockName != null){
+            if (stockName != null) {
                 // 종목명을 URL 인코딩하여 API 호출
                 StringBuffer stockPriceData = getStockPrice(URLEncoder.encode(stockName, "UTF-8"), frdt, todt);
 
@@ -77,7 +79,8 @@ class Panel3Action { // 관심주식
             searchButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    InterestStockFrame();
+                    DefaultTableModel DefaultTableModel = new DefaultTableModel();
+                    InterestStockFrame(tableModel);
                 }
             });
             panel.add(searchButton, BorderLayout.SOUTH);  // Add the button to the SOUTH position of the panel
@@ -195,36 +198,126 @@ class Panel3Action { // 관심주식
         }
 
     }
+
     private static String getValue(String tag, Element element) {
         NodeList nodeList = element.getElementsByTagName(tag).item(0).getChildNodes();
         Node node = nodeList.item(0);
         return node.getNodeValue();
     }
 
-    private static void InterestStockFrame() {
+    private static void InterestStockFrame(DefaultTableModel tableModel) {
         JFrame interestFrame = new JFrame("관심 주식 추가");
         interestFrame.setLocation(200, 400);
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
-
 
         JPanel inputPanel = new JPanel();
         JLabel l1 = new JLabel();
         JTextField text = new JTextField(15);
         JButton searchButton = new JButton("검색");
 
-
         inputPanel.add(l1);
         inputPanel.add(text);
         inputPanel.add(searchButton);
 
-        panel.add(BorderLayout.CENTER, inputPanel);
-        panel.add(BorderLayout.SOUTH, new JLabel());
+        panel.add(BorderLayout.NORTH, inputPanel);
 
         interestFrame.getContentPane().add(panel);
         interestFrame.setSize(400, 400);
         interestFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         interestFrame.setVisible(true);
         interestFrame.setLayout(new BorderLayout());
-    }
-}
+
+        DefaultListModel<String> listModel = new DefaultListModel<>();
+        //스크롤이 되나 보려고 많이 넣어놓은 것
+        listModel.addElement("삼성");
+        listModel.addElement("삼성1");
+        listModel.addElement("삼성2");
+        listModel.addElement("삼성3");
+        listModel.addElement("삼성4");
+        listModel.addElement("삼성5");
+        listModel.addElement("삼성6");
+        listModel.addElement("삼성7");
+        listModel.addElement("삼성8");
+        listModel.addElement("삼성9");
+        listModel.addElement("삼성10");
+        listModel.addElement("삼성11");
+        listModel.addElement("삼성12");
+        listModel.addElement("삼성13");
+        listModel.addElement("삼성14");
+        listModel.addElement("삼성15");
+        listModel.addElement("삼성16");
+        listModel.addElement("삼성17");
+        listModel.addElement("삼성18");
+        listModel.addElement("삼성19");
+        listModel.addElement("삼성20");
+        listModel.addElement("삼성21");
+        listModel.addElement("삼성22");
+        listModel.addElement("삼성23");
+        listModel.addElement("현대");
+
+        JList<String> searchList = new JList<>(listModel);
+        JScrollPane scrollPane = new JScrollPane(searchList);
+        panel.add(scrollPane, BorderLayout.CENTER); // Changed to CENTER
+
+        // 검색 리스트와 스크롤 패널 초기에는 보이지 않도록 설정
+        searchList.setVisible(false);
+        scrollPane.setVisible(false);
+
+        text.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                updateList();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                updateList();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                updateList();
+            }
+
+            private void updateList() {
+                String searchText = text.getText().toLowerCase();
+                DefaultListModel<String> filteredModel = new DefaultListModel<>();
+                for (int i = 0; i < listModel.size(); i++) {
+                    String item = listModel.getElementAt(i);
+                    if (item.toLowerCase().contains(searchText)) {
+                        filteredModel.addElement(item);
+                    }
+                }
+                searchList.setModel(filteredModel);
+                searchList.setVisible(!searchText.isEmpty());
+                scrollPane.setVisible(!searchText.isEmpty());
+            }
+        });
+
+        searchList.addListSelectionListener(e -> {
+            String selectedValue = searchList.getSelectedValue();
+            if (selectedValue != null) {
+                // 테이블에 선택된 항목이 없으면 추가
+                boolean alreadyExists = false;
+                for (int i = 0; i < tableModel.getRowCount(); i++) {
+                    if (selectedValue.equals(tableModel.getValueAt(i, 0))) {
+                        alreadyExists = true;
+                        break;
+                    }
+                }
+
+                // 테이블 모델에 추가되지 않은 경우에만 추가
+                if (!alreadyExists) {
+                    tableModel.addRow(new Object[]{selectedValue, "", "", "", "", "", ""});
+                }
+            }
+        });
+
+        searchButton.addActionListener(e -> {
+
+            searchList.setVisible(true);
+            scrollPane.setVisible(true);
+            interestFrame.revalidate();
+        });
+    }}
