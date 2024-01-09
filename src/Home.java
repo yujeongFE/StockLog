@@ -36,14 +36,6 @@ class Panel1Action { // 종목 지수
     }
 }
 
-// 패널 2에 대한 동작을 처리하는 클래스
-class Panel2Action { // 매도주식
-    public static void addFunctionality(JPanel panel) {
-        // 패널 2에 추가할 기능 구현
-
-    }
-}
-
 /*// 패널 3에 대한 동작을 처리하는 클래스 -> Panel3Action.java에서 하시면 됩니다
 class Panel3Action { // 관심주식
     static Object[] row = new Object[7];
@@ -431,7 +423,7 @@ public class Home {
 
         // 패널에 기능 추가
         Panel1Action.addFunctionality(topLeftPanel); // 패널 1에 기능 추가
-        Panel2Action.addFunctionality(topRightPanel); // 패널 2에 기능 추가
+        Panel2Action.addFunctionality(topRightPanel, userId); // 패널 2에 기능 추가
         Panel3Action.addFunctionality(bottomLeftPanel, userId); // 관심 주식 표시
         Panel4Action.addFunctionality(bottomRightPanel, userId); // 패널 4에 기능 추가
         Panel5Action.addFunctionality(rightPanel, userId); // 패널 5에 기능 추가
