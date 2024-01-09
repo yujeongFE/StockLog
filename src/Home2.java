@@ -1,7 +1,8 @@
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
-//패널 5-1
+
+// 패널 5-1
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -89,6 +90,17 @@ class PanelAction5_1 { // 매도주식
                 JTextArea textArea = new JTextArea(response.toString());
                 textArea.setEditable(false); // 읽기 전용으로 설정
 
+                // 텍스트를 20단어씩 나누어 JTextArea에 추가
+                String[] words = response.toString().split("\\s+");
+                int wordCount = 0;
+                for (String word : words) {
+                    textArea.append(word + " ");
+                    wordCount++;
+                    if (wordCount == 20) {
+                        textArea.append("\n"); // 20단어마다 줄바꿈
+                        wordCount = 0;
+                    }
+                }
                 // JScrollPane을 사용하여 텍스트 영역이 넘칠 경우 스크롤 가능하도록 함
                 JScrollPane scrollPane = new JScrollPane(textArea);
                 scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
