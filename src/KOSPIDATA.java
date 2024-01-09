@@ -2,6 +2,8 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.DateAxis;
+import org.jfree.chart.axis.DateTickUnit;
+import org.jfree.chart.axis.DateTickUnitType;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
@@ -19,6 +21,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 public class KOSPIDATA {
     public static void main(String[] args) {
@@ -74,6 +77,11 @@ public class KOSPIDATA {
         JSONParser parser = new JSONParser();
 
         try {
+            // 타임스탬프를 일반 시간대로 변환하여 리스트에 저장
+            List<String> 일반시간대데이터 = new ArrayList<>();
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            dateFormat.setTimeZone(TimeZone.getTimeZone("Asia/Seoul")); // 적절한 타임존 설정
+
             JSONObject jsonObject = (JSONObject) parser.parse(jsonResponse);
             JSONObject chartObject = (JSONObject) jsonObject.get("chart");
             JSONArray resultArray = (JSONArray) chartObject.get("result");
@@ -87,17 +95,16 @@ public class KOSPIDATA {
             JSONArray timestampArray = (JSONArray) resultObject.get("timestamp");
             JSONArray closeArray = (JSONArray) quoteObject.get("close");
 
-            // 타임스탬프데이터 채우기
+            // 타임스탬프 데이터 채우기
             for (Object timestamp : timestampArray) {
                 타임스탬프데이터.add((Long) timestamp);
             }
 
-            // 종가데이터 채우기
+            // 종가 데이터 채우기
             for (Object close : closeArray) {
                 종가데이터.add((Double) close);
             }
 
-            // 데이터셋 생성
             XYSeries series = new XYSeries("종가");
 
             // 타임스탬프가 초 단위로 주어진 경우 여부 확인 (필요시 1000.0으로 나누지 않음)
@@ -107,15 +114,20 @@ public class KOSPIDATA {
             // 타임스탬프를 double로 변환하여 x값으로 사용
             for (int i = 0; i < 타임스탬프데이터.size(); i++) {
                 double x값 = 타임스탬프데이터.get(i) / 시간단위; // 초로 변환 필요시에만 나누기
-                System.out.println("타임스탬프: " + 타임스탬프데이터.get(i) + ", 변환된 x값: " + x값);
+
+                // Use the 일반시간대데이터 directly as x-axis labels
                 series.add(x값, 종가데이터.get(i));
+            }
+
+            // 출력된 일반 시간대 데이터 확인
+            for (int i = 0; i < 일반시간대데이터.size(); i++) {
+                System.out.println("타임스탬프: " + 타임스탬프데이터.get(i) + ", 일반시간대: " + 일반시간대데이터.get(i));
             }
 
             XYSeriesCollection dataset = new XYSeriesCollection(series);
 
-            // 차트 생성
             JFreeChart chart = ChartFactory.createTimeSeriesChart(
-                    "KOSPI 차트", // 차트 제목
+                    "KOSPI", // 차트 제목
                     "날짜", // X축 레이블
                     "종가", // Y축 레이블
                     dataset, // 데이터셋
@@ -124,10 +136,17 @@ public class KOSPIDATA {
                     false // URL 생성 설정
             );
 
-            // x축 날짜 표시 형식 지정
             DateAxis dateAxis = new DateAxis("날짜");
-            dateAxis.setDateFormatOverride(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")); // 날짜 및 시간 형식 설정
-            chart.getXYPlot().setDomainAxis(dateAxis);
+            dateAxis.setTimeZone(TimeZone.getTimeZone("Asia/Seoul"));
+
+// Set custom labels from 일반시간대데이터
+            String[] labelsArray = 일반시간대데이터.toArray(new String[0]);
+            dateAxis.setTickUnit(new DateTickUnit(DateTickUnitType.DAY, 1));
+
+// Set custom tick labels
+            dateAxis.setTickUnit(new DateTickUnit(DateTickUnitType.DAY, 1));
+            dateAxis.setTickLabelsVisible(true);
+            dateAxis.setStandardTickUnits(new DateAxis().getStandardTickUnits());
 
             // y축 범위 설정
             NumberAxis rangeAxis = (NumberAxis) chart.getXYPlot().getRangeAxis();

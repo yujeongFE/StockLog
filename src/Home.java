@@ -29,8 +29,14 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Scanner;
 
+
 // 패널 1에 대한 동작을 처리하는 클래스
 class Panel1Action { // 종목 지수
+    public static void addFunctionality(JPanel panel) {
+        // 패널 1에 추가할 기능 구현
+    }
+}
+class Panel11Action { // 종목 지수
     public static void addFunctionality(JPanel panel) {
         // 패널 1에 추가할 기능 구현
     }
@@ -424,7 +430,8 @@ public class Home {
         JPanel mainPanel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
 
-        JPanel topLeftPanel = createPanelWithBorder("1"); // 종목지수
+        JPanel topLeftPanel = createPanelWithBorder("1"); // 코스피 지수
+        JPanel topLeftPanel2 = createPanelWithBorder("1-1"); // 코스닥 지수
         JPanel topRightPanel = createPanelWithBorder("2"); // 매도주식
         JPanel bottomLeftPanel = createPanelWithBorder("3"); // 관심주식
         JPanel bottomRightPanel = createPanelWithBorder("4"); // 보유주식
@@ -438,18 +445,24 @@ public class Home {
 
         // 패널에 기능 추가
         Panel1Action.addFunctionality(topLeftPanel); // 패널 1에 기능 추가
+        Panel1Action.addFunctionality(topLeftPanel2); // 패널 1-1에 기능 추가
         Panel2Action.addFunctionality(topRightPanel); // 패널 2에 기능 추가
         Panel3Action.addFunctionality(bottomLeftPanel, userId); // 관심 주식 표시
         Panel4Action.addFunctionality(bottomRightPanel); // 패널 4에 기능 추가
         Panel5Action.addFunctionality(rightPanel, userId); // 패널 5에 기능 추가
         Panel6Action.addFunctionality(bottomPanel); // 하단 바에 기능 추가
 
+        JPanel panel11_1 = new JPanel();
+        panel11_1.setLayout(new GridLayout(1, 2));
+        panel11_1.add(topLeftPanel);
+        panel11_1.add(topLeftPanel2);
+
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.weightx = 1.0; // gbc.weightx = 1.0;은 해당 컴포넌트가 그리드의 가로 방향으로 가능한 최대 공간을 차지
+        gbc.weightx = 1.0;
         gbc.weighty = 1.0;
-        gbc.fill = GridBagConstraints.BOTH; // 가로 및 세로 방향으로 모두 공간을 채움 // fill 속성은 해당 컴포넌트가 할당받은 공간을 어떻게 채울지를 지정
-        mainPanel.add(topLeftPanel, gbc);
+        gbc.fill = GridBagConstraints.BOTH;
+        mainPanel.add(panel11_1, gbc);
 
         gbc.gridx = 1;
         gbc.gridy = 0;
@@ -461,20 +474,18 @@ public class Home {
 
         gbc.gridx = 1;
         gbc.gridy = 1;
-
         mainPanel.add(bottomRightPanel, gbc);
 
         gbc.gridx = 2;
         gbc.gridy = 0;
         gbc.gridheight = 2;
-        gbc.fill = GridBagConstraints.BOTH; // 가로 및 세로 방향으로 모두 공간을 채움
+        gbc.fill = GridBagConstraints.BOTH;
         mainPanel.add(rightPanel, gbc);
 
         frame.add(mainPanel);
         frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
-
     }
 
     /*// 3패널 가져오기
