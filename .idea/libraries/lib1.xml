@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="lib1">
+    <CLASSES>
+      <root url="file://$USER_HOME$/Downloads/httpcomponents-client-5.3-bin/lib" />
+      <root url="jar://$USER_HOME$/Downloads/json-simple-1.1.1.jar!/" />
+      <root url="jar://$USER_HOME$/Downloads/jsoup-1.17.2.jar!/" />
+      <root url="jar://$USER_HOME$/Downloads/gson-2.8.7.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+    <jarDirectory url="file://$USER_HOME$/Downloads/httpcomponents-client-5.3-bin/lib" recursive="false" />
+  </library>
+</component>
