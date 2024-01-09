@@ -1,21 +1,19 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.io.IOException;
-
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.SwingUtilities;
+import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 class H2_PanelAction5 {
     private static JButton searchButton;
     private static JTextArea newsTextArea;
-
 
     public static void addFunctionality(JPanel panel) {
         // 패널 5에 추가할 기능 구현
@@ -52,17 +50,8 @@ class H2_PanelAction5 {
 
         // 패널의 가운데 영역에 JScrollPane 추가
         panel.add(scrollPane, BorderLayout.CENTER);
-
-        // JTextArea의 높이를 현재 높이의 절반으로 설정 (크기 조절)
-        Dimension size = newsTextArea.getPreferredSize();
-        size.height = size.height / 2;  // 현재 높이의 절반
-        newsTextArea.setPreferredSize(size);
-
-        // 패널의 크기를 현재 크기의 1/3로 설정 (가로 크기 조절)
-        Dimension panelSize = panel.getPreferredSize();
-        panelSize.width = panelSize.width / 3;  // 현재 가로 크기의 1/3
-        panel.setPreferredSize(panelSize);
     }
+
     private static void performNewsSearch(String userInterestStock, JPanel panel) {
         String apiKey = "1277dcdf93f8462a96f2efd5778607ae";
         String apiUrl = "https://newsapi.org/v2/everything?q=" + userInterestStock + "&apiKey=" + apiKey;
@@ -86,22 +75,22 @@ class H2_PanelAction5 {
                     reader.close();
                     connection.disconnect();
 
+                    // JSON 파싱을 통해 필요한 정보 추출
+                    String newsTable = parseJson(response.toString());
+
                     // JTextArea에 뉴스 정보 설정
-                    newsTextArea.setText(response.toString());
+                    newsTextArea.setText(newsTable);
 
                     // 검색 창의 텍스트를 자동으로 설정
-                    // 만약 검색 창을 JTextField로 사용했다면 setText를 사용
-                    // 여기에서는 JTextArea를 사용하므로 해당하는 메서드 사용
                     newsTextArea.append("\n\nSearch Term: " + userInterestStock);
 
                     // 패널을 다시 그리도록 갱신
                     panel.revalidate();
                     panel.repaint();
-                } catch (IOException ex) { // IOException 추가
+                } catch (IOException ex) {
                     ex.printStackTrace();
                     // 사용자에게 알림
                     JOptionPane.showMessageDialog(null, "Error: Unable to fetch news data. Please check your internet connection.");
-
                 } catch (Exception ex) {
                     ex.printStackTrace();
                     // 사용자에게 알림
@@ -110,4 +99,50 @@ class H2_PanelAction5 {
             }
         });
     }
-};
+
+    private static String parseJson(String jsonString) {
+        // 정규식을 사용하여 JSON 데이터 파싱
+        String titlePattern = "\"title\":\"([^\"]*)\"";
+        String descriptionPattern = "\"description\":\"([^\"]*)\"";
+        String authorPattern = "\"author\":\"([^\"]*)\"";
+
+        Pattern titleRegex = Pattern.compile(titlePattern);
+        Pattern descriptionRegex = Pattern.compile(descriptionPattern);
+        Pattern authorRegex = Pattern.compile(authorPattern);
+
+        Matcher titleMatcher = titleRegex.matcher(jsonString);
+        Matcher descriptionMatcher = descriptionRegex.matcher(jsonString);
+        Matcher authorMatcher = authorRegex.matcher(jsonString);
+
+        ArrayList<String> titles = new ArrayList<>();
+        ArrayList<String> descriptions = new ArrayList<>();
+        ArrayList<String> authors = new ArrayList<>();
+
+        while (titleMatcher.find()) {
+            titles.add(titleMatcher.group(1));
+        }
+
+        while (descriptionMatcher.find()) {
+            descriptions.add(descriptionMatcher.group(1));
+        }
+
+        while (authorMatcher.find()) {
+            authors.add(authorMatcher.group(1));
+        }
+
+        // 표 형식으로 데이터 정리
+        StringBuilder newsTable = new StringBuilder();
+        newsTable.append(String.format("%-50s%-100s%-30s%n", "Title", "Description", "Author"));
+
+        int maxSize = Math.max(Math.max(titles.size(), descriptions.size()), authors.size());
+        for (int i = 0; i < maxSize; i++) {
+            String title = i < titles.size() ? titles.get(i) : "";
+            String description = i < descriptions.size() ? descriptions.get(i) : "";
+            String author = i < authors.size() ? authors.get(i) : "";
+
+            newsTable.append(String.format("%-50s%-100s%-30s%n", title, description, author));
+        }
+
+        return newsTable.toString();
+    }
+}
