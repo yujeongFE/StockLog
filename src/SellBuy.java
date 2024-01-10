@@ -5,7 +5,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.NumberFormat;
-import java.text.ParseException;
 
 import static src.Panel5Action.tableModel;
 
@@ -14,11 +13,18 @@ public class SellBuy {
     private JPanel sellbuylog;
     private SellBuyPanel sp;
     private CardLayout card;
+    private String selectedStockName;
 
     public static void main(String[] args) {
         SellBuy sb = new SellBuy();
         sb.setFrame(sb);
 
+
+
+    }
+
+    public void setSelectedStockName(String stockName) {
+        selectedStockName = stockName;
     }
 
 
@@ -40,9 +46,11 @@ public class SellBuy {
 
     }
 
-    public void openFrame() {
+    public void openFrame(String selectedStockName) {
         card.show(sellbuylog, sp.getName());
+        sp.setStockNameTextField(selectedStockName);
     }
+
 }
 
 class SellBuyPanel extends JPanel {
@@ -55,6 +63,21 @@ class SellBuyPanel extends JPanel {
     private JTextArea memo;
     private JButton addButton;
 
+
+
+
+    public void setStockNameTextField(String stockName) {
+        itemname.setText(stockName);
+    }
+
+
+
+
+
+
+
+
+
     public JPanel mainPanel;
 
     public SellBuyPanel(SellBuy sp) {
@@ -63,7 +86,6 @@ class SellBuyPanel extends JPanel {
         c.fill = GridBagConstraints.HORIZONTAL;
         c.insets = new Insets(10, 10, 10, 10);
 
-        // Initialize components
         itemname = new JTextField(15);
         stockfirm = new JTextField(15);
         returnprice = new JTextField(15);
@@ -94,7 +116,6 @@ class SellBuyPanel extends JPanel {
 
         addButton = new JButton("추가");
 
-        // Add components to the panel
         c.gridx = 0;
         c.gridy = 0;
         add(new JLabel("종목명 : "), c);
@@ -174,24 +195,21 @@ class SellBuyPanel extends JPanel {
                         + dayComboBox.getSelectedItem();
                 int selectedQuantity = (int) quantity.getSelectedItem();
 
-                // Extract the raw numeric value from the formatted text field
+
                 Number selectedPrice = 0;
                 try {
                     String formattedValue = price.getText();
-                    // Remove non-numeric characters from the formatted value
                     String numericValue = formattedValue.replaceAll("[^0-9.]", "");
-                    selectedPrice = Double.parseDouble(numericValue); // Assuming the price is a decimal, adjust as needed
+                    selectedPrice = Double.parseDouble(numericValue);
                 } catch (NumberFormatException ex) {
                     ex.printStackTrace();
                 }
 
-                // Extract the raw numeric value from the returnprice text field
                 Number selectedReturnPrice = 0;
                 try {
                     String returnPriceValue = returnprice.getText();
-                    // Remove non-numeric characters from the returnprice value
                     String numericReturnPrice = returnPriceValue.replaceAll("[^0-9.]", "");
-                    selectedReturnPrice = Double.parseDouble(numericReturnPrice); // Assuming the return price is a decimal
+                    selectedReturnPrice = Double.parseDouble(numericReturnPrice);
                 } catch (NumberFormatException ex) {
                     ex.printStackTrace();
                 }
@@ -201,7 +219,6 @@ class SellBuyPanel extends JPanel {
                 String selectedBuyOrSell = sellButton.isSelected() ? "매도" : "매수";
                 String selectedMemo = memo.getText();
 
-                // Add the entered values to the tableModel
                 Object[] rowData = new Object[]{
                         selectedStockName,
                         selectedStockFirm,
@@ -209,15 +226,13 @@ class SellBuyPanel extends JPanel {
                         selectedDate,
                         selectedPrice,
                         selectedQuantity,
-                        selectedReturnPrice,  // Set the value for "매매비용(세금, 수수료)"
+                        selectedReturnPrice,
                         selectedMemo
                 };
 
                 tableModel.addRow(rowData);
 
-                // You may need to calculate and set the "수익률" based on the added row data
 
-                // Print the tableModel data (you can remove this line later)
                 for (int i = 0; i < tableModel.getRowCount(); i++) {
                     for (int j = 0; j < tableModel.getColumnCount(); j++) {
                         System.out.print(tableModel.getValueAt(i, j) + " ");
@@ -231,7 +246,6 @@ class SellBuyPanel extends JPanel {
 
 
 
-        // Create the main panel and add components
         mainPanel = new JPanel();
         mainPanel.setBorder(BorderFactory.createEmptyBorder(25, 25, 25, 25));
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
