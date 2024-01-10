@@ -1,16 +1,3 @@
-<dependencies>
->
-    <dependency>
-        <groupId>com.google.code.gson</groupId>
-        <artifactId>gson</artifactId>
-        <version>2.8.9</version> 
-        <groupId>org.jfree</groupId>
-        <artifactId>jfreechart</artifactId>
-        <version>1.5.3</version>
-    </dependency>
-</dependencies>
-
-  
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.jfree.chart.ChartFactory;
