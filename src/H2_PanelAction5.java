@@ -15,7 +15,7 @@ class H2_PanelAction5 {
     private static JButton searchButton;
     private static JTextArea newsTextArea;
 
-    public static void addFunctionality(JPanel panel) {
+    public static void addFunctionality(JPanel panel, String stockName) {
         // 패널 5에 추가할 기능 구현
         searchButton = new JButton("검색");
 
@@ -26,19 +26,14 @@ class H2_PanelAction5 {
         searchButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (Panel3Action.userInterestStock != null && !Panel3Action.userInterestStock.isEmpty()) {
+                if (stockName != null && !stockName.isEmpty()) {
                     // 검색 창의 텍스트를 사용하여 뉴스 검색 수행
-                    performNewsSearch(Panel3Action.userInterestStock, panel);
+                    performNewsSearch(stockName, panel);
                 } else {
                     JOptionPane.showMessageDialog(null, "Please enter a valid stock symbol.");
                 }
             }
         });
-
-
-
-
-
 
 
         // 검색 버튼의 ActionListener에서 사용자로부터 주식 기호를 입력 받지 않고,
