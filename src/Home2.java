@@ -47,17 +47,12 @@ class PanelAction1 { // 종목 지수
 }
 
 // 패널 2에 대한 동작을 처리하는 클래스
-/* class H2_PanelAction2 { // 매도주식
-    public static void addFunctionality(JPanel panel) {
-        // 패널 2에 추가할 기능 구현
-    }
-} */
+// H2_PanelAction2.java 에 있습니다.
 
-class PanelAction2_1 { // 매도주식
-    public static void addFunctionality(JPanel panel) {
-        // 패널 2에 추가할 기능 구현
-    }
-}
+
+//class PanelAction2_1 { // 매도주식
+// H2_PanelAction2_1.java 에 있습니다.
+
 
 // 패널 5에 대한 동작을 처리하는 클래스
 // H2_PanelAction5.java 에 있습니다.
@@ -115,13 +110,13 @@ public class Home2 {
 
 
         // 패널에 기능 추가
-        PanelAction1.addFunctionality(topLeftPanel); // 패널 1에 기능 추가
-        H2_PanelAction2.addFunctionality(topRightPanel1,stockName); // 패널 2에 기능 추가
+        //PanelAction1.addFunctionality(topLeftPanel); // 패널 1에 기능 추가
+        //H2_PanelAction2.addFunctionality(topRightPanel1,stockName); // 패널 2에 기능 추가
         H2_PanelAction2_1.addFunctionality(topRightPanel2,stockName); // 패널 2-1에 기능 추가
-        PanelAction3.addFunctionality(bottomLeftPanel, userId); // 관심 주식 표시
-        PanelAction4.addFunctionality(bottomRightPanel, userId); // 보유 주식 표시
+        //PanelAction3.addFunctionality(bottomLeftPanel, userId); // 관심 주식 표시
+        //PanelAction4.addFunctionality(bottomRightPanel, userId); // 보유 주식 표시
         H2_PanelAction5.addFunctionality(rightPanel1, stockName); // 패널 5에 기능 추가
-        PanelAction6.addFunctionality(rightBottomPanel, userId, stockName); // 패널 6에 기능 추가
+        //PanelAction6.addFunctionality(rightBottomPanel, userId, stockName); // 패널 6에 기능 추가
         PanelAction7.addFunctionality(bottomPanel); // 하단 바에 기능 추가
 
         // 패널 5-1에 기능 추가
