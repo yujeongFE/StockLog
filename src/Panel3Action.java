@@ -24,6 +24,11 @@ class Panel3Action { // 관심주식
     // 데이터를 담을 테이블 모델 생성
     static DefaultTableModel tableModel = new DefaultTableModel();
 
+
+    // 사용자가 입력한 관심 주식 데이터를 저장할 정적 변수(H2_PanelAction5.java에서 필요)
+    static String userInterestStock;
+
+
     public static void addFunctionality(JPanel panel, String userId) {
         // 데이터베이스 연결
         DBconnection dbConnector = new DBconnection();
@@ -185,6 +190,11 @@ class Panel3Action { // 관심주식
         doc.getDocumentElement().normalize();
 
         NodeList itemList = doc.getElementsByTagName("item");
+
+
+        // 사용자가 입력한 관심 주식 데이터를 저장 (H2_PanelAction5.java에서 필요)
+        Panel3Action.userInterestStock = userInterestStock;
+
 
         // 출력 행 구성
 
