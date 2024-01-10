@@ -12,6 +12,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.*;
 import java.net.*;
 import java.sql.*;
@@ -97,6 +99,22 @@ class Panel3Action { // 관심주식
 
             // 테이블 생성 및 패널에 추가
             JTable table = new JTable(tableModel);
+
+            // 주식 클릭하면 Home2 화면으로 이동
+            table.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    if (e.getClickCount() == 1) { // 클릭 확인
+                        JTable target = (JTable) e.getSource();
+                        int row = target.getSelectedRow();
+
+                        // 여기서 선택된 행의 데이터를 얻을 수 있어요.
+                        String stockName = (String) tableModel.getValueAt(row, 0); // 종목명은 첫 번째 열(인덱스 0)
+                        // System.out.println(stockName);
+                        new Home2(userId, stockName); // 종목명을 이용해 페이지를 열거나 처리하는 함수 호출
+                    }
+                }
+            });
 
             // 테이블 크기 조정
             table.setPreferredScrollableViewportSize(table.getPreferredSize());
