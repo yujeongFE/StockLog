@@ -29,28 +29,12 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Scanner;
 
-
-// 패널 1에 대한 동작을 처리하는 클래스
-class Panel1Action { // 종목 지수
-    public static void addFunctionality(JPanel panel) {
-        // 패널 1에 추가할 기능 구현
-    }
-}
-class Panel11Action { // 종목 지수
-    public static void addFunctionality(JPanel panel) {
-        // 패널 1에 추가할 기능 구현
-    }
-}
-
-
 // 하단바에 대한 동작을 처리하는 클래스
 class Panel6Action { // 매도주식
     public static void addFunctionality(JPanel panel) {
         // 하단바에 추가할 기능 구현
     }
 }
-
-
 
 public class Home {
     static String userId; // 사용자 id 저장 변수 추가
@@ -78,7 +62,7 @@ public class Home {
 
         // 패널에 기능 추가
         Panel1Action.addFunctionality(topLeftPanel); // 패널 1에 기능 추가
-        Panel1Action.addFunctionality(topLeftPanel2); // 패널 1-1에 기능 추가
+        Panel11Action.addFunctionality(topLeftPanel2);
         Panel2Action.addFunctionality(topRightPanel, userId); // 패널 2에 기능 추가
         Panel3Action.addFunctionality(bottomLeftPanel, userId); // 관심 주식 표시
         Panel4Action.addFunctionality(bottomRightPanel, userId); // 패널 4에 기능 추가
@@ -121,11 +105,6 @@ public class Home {
         frame.setVisible(true);
     }
 
-    /*// 3패널 가져오기
-    public JPanel getBottomLeftPanel() {
-        return bottomLeftPanel;
-    }*/
-
     private JPanel createPanelWithBorder(String text) {
         JPanel panel = new JPanel(new BorderLayout());
         JLabel label = new JLabel(text, SwingConstants.CENTER);
@@ -138,16 +117,10 @@ public class Home {
         return panel;
     }
 
-
     public static void main(String[] args) {
         DBconnection dbConnector = new DBconnection();
         SwingUtilities.invokeLater(() -> {
             Home home = new Home(userId);
-
-            //
-            /*PanelAction panel3Action = new PanelAction();
-            JPanel bottomLeftPanel = home.getBottomLeftPanel(); // Home 클래스의 bottomLeftPanel 가져오기*/
-
         });
     }
 }
