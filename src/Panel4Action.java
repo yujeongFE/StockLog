@@ -18,8 +18,8 @@ import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-// 패널 3에 대한 동작을 처리하는 클래스
-class Panel4Action { // 관심주식
+// 패널 4에 대한 동작을 처리하는 클래스
+class Panel4Action { // 보유주식
     static Object[] row = new Object[7];
     // 데이터를 담을 테이블 모델 생성
     static double e_price;
@@ -96,7 +96,7 @@ class Panel4Action { // 관심주식
             Dimension panelSize = panel.getPreferredSize();
             int newScrollPaneHeight = (int) (panelSize.height * 0.66); // 2/3의 크기
 
-            System.out.println(newScrollPaneHeight);
+            // System.out.println(newScrollPaneHeight);
 
             scrollPane.setPreferredSize(new Dimension(0, newScrollPaneHeight)); // 가로 크기는 자동으로 조정됨
 
