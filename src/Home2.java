@@ -74,7 +74,13 @@ class PanelAction6 { // 매도주식
 public class Home2 {
     private JPanel bottomLeftPanel; // bottomLeftPanel 필드 추가
 
-    public Home2() {
+    static String userId; // 사용자 id 저장 변수 추가
+    static String stockName; // 주식종목명 저장 변수 추가
+
+    public Home2(String userId, String stockName) {
+        this.userId = userId;
+        this.stockName = stockName;
+
         JFrame frame = new JFrame("주식 매매 관리 시스템");
 
         JPanel mainPanel = new JPanel(new GridBagLayout());
@@ -116,7 +122,7 @@ public class Home2 {
         PanelAction6.addFunctionality(bottomPanel); // 하단 바에 기능 추가
 
         // 패널 5-1에 기능 추가
-        H2_PanelAction5_1.addFunctionality(rightPanel2, bottomLeftPanel);
+        // H2_PanelAction5_1.addFunctionality(rightPanel2, bottomLeftPanel);
 
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -175,7 +181,7 @@ public class Home2 {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             try {
-                Home2 home2 = new Home2();
+                Home2 home2 = new Home2(userId, stockName);
             } catch (Exception e) {
                 e.printStackTrace();
             }
