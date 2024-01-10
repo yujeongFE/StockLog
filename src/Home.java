@@ -65,7 +65,7 @@ public class Home {
         Panel11Action.addFunctionality(topLeftPanel2);
         Panel2Action.addFunctionality(topRightPanel, userId); // 패널 2에 기능 추가
         Panel3Action.addFunctionality(bottomLeftPanel, userId); // 관심 주식 표시
-        Panel4Action.addFunctionality(bottomRightPanel, userId); // 패널 4에 기능 추가
+        Panel4Action.addFunctionality(bottomRightPanel, userId); // 보유 주식 표시
         Panel5Action.addFunctionality(rightPanel, userId); // 패널 5에 기능 추가
         Panel6Action.addFunctionality(bottomPanel); // 하단 바에 기능 추가
 
