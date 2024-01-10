@@ -2,6 +2,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -9,6 +11,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -26,6 +29,9 @@ class Panel3Action { // 관심주식
     // 데이터를 담을 테이블 모델 생성
     static DefaultTableModel tableModel = new DefaultTableModel();
 
+    // 사용자가 입력한 관심 주식 데이터를 저장할 정적 변수(H2_PanelAction5.java에서 필요)
+    static String userInterestStock;
+
     public static void addFunctionality(JPanel panel, String userId) {
         // 데이터베이스 연결
         DBconnection dbConnector = new DBconnection();
@@ -39,41 +45,21 @@ class Panel3Action { // 관심주식
             ResultSet resultSet = statement.executeQuery(query);
 
             // 원하는 컬럼 순서와 이름을 추가
-            tableModel.addColumn("종목명"); //
-            tableModel.addColumn("종목코드"); //
+            tableModel.addColumn("종목명");
+            tableModel.addColumn("종목코드");
             tableModel.addColumn("현재주가");
-            tableModel.addColumn("시장 구분"); //
+            tableModel.addColumn("시장 구분");
             tableModel.addColumn("전일대비등락");
             tableModel.addColumn("전일대비등락비");
-            tableModel.addColumn("메모"); //
+            tableModel.addColumn("메모");
 
             // 결과셋의 데이터를 테이블 모델에 추가
-            String stockName = null; // 변수를 루프 바깥에 선언하고 초기화
             while (resultSet.next()) {
                 row[0] = resultSet.getObject(1);
-                stockName = resultSet.getObject(1).toString(); // Object를 String으로 변환하여 stockName에 저장
                 row[1] = resultSet.getObject(2);
                 row[3] = resultSet.getObject(3);
                 row[6] = resultSet.getObject(4);
-                // tableModel.addRow(row);
-            }
-
-            // 날짜 범위 설정
-            String[] dateRange = getLastBusinessDayRange();
-            String frdt = dateRange[0];
-            String todt = dateRange[1];
-
-            if (stockName != null) {
-                // 종목명을 URL 인코딩하여 API 호출
-                StringBuffer stockPriceData = getStockPrice(URLEncoder.encode(stockName, "UTF-8"), frdt, todt);
-
-                if (stockPriceData.length() > 0) {
-                    // 데이터 파싱 및 표로 정리하여 출력
-                    printStockPriceTable(stockPriceData);
-                } else {
-                    System.out.println("No stock price data available for the specified parameters.");
-                }
-            } else {
+                tableModel.addRow(row);
             }
 
             // JButton 생성 및 패널에 추가
@@ -86,7 +72,6 @@ class Panel3Action { // 관심주식
                 }
             });
             panel.add(searchButton, BorderLayout.SOUTH);  // Add the button to the SOUTH position of the panel
-
 
             // JLabel 생성 및 패널에 추가
             JLabel label = new JLabel("관심 주식", SwingConstants.CENTER); // SwingConstants.CENTER로 가운데 정렬
@@ -105,7 +90,6 @@ class Panel3Action { // 관심주식
 
                         // 여기서 선택된 행의 데이터를 얻을 수 있어요.
                         String stockName = (String) tableModel.getValueAt(row, 0); // 종목명은 첫 번째 열(인덱스 0)
-                        // System.out.println(stockName);
                         new Home2(userId, stockName); // 종목명을 이용해 페이지를 열거나 처리하는 함수 호출
                     }
                 }
@@ -130,10 +114,6 @@ class Panel3Action { // 관심주식
 
         } catch (SQLException e) {
             e.printStackTrace();
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
         } finally {
             // 연결 닫기
             dbConnector.closeConnection();
@@ -161,18 +141,18 @@ class Panel3Action { // 관심주식
 
         return new String[]{frdt, todt};
     }
-
-    private static StringBuffer getStockPrice(String likeSrtnCd, String frdt, String todt) throws Exception {
+    private static StringBuffer getStockPriceWithDifferentParam(String encodedSearchTerm, String frdt, String todt) throws Exception {
         BufferedReader in = null;
         StringBuffer strBuffer = new StringBuffer();
 
         try {
-            // 외부 API 호출을 위한 URL 설정
+            // API 요청 URL을 동적으로 생성
             String urlStr = "https://api.odcloud.kr/api/GetStockSecuritiesInfoService/v1/getStockPriceInfo?";
             urlStr += "serviceKey=" + "1%2FWP%2BVc3M5kGU2bikqOuBl9hAtMQ7OeqB24EL0llGF9zC75kdgM1jbsTy90LiI9hmDwU7jeFjW8P%2B1VPFtc%2BDg%3D%3D";  // API 키를 적절하게 설정
             urlStr += "&beginBasDt=" + frdt;
             urlStr += "&endBasDt=" + todt;
-            urlStr += "&itmsNm=" + likeSrtnCd;
+            urlStr += "&likeItmsNm=" + encodedSearchTerm;
+            System.out.println(urlStr);
 
             URL obj = new URL(urlStr);
             HttpURLConnection con = (HttpURLConnection) obj.openConnection();
@@ -194,6 +174,43 @@ class Panel3Action { // 관심주식
         }
         return strBuffer;
     }
+    private static String getStockPrice(String likeSrtnCd, String frdt, String todt) throws Exception {
+        BufferedReader in = null;
+        String userSearchTerm = URLEncoder.encode(likeSrtnCd, "UTF-8");
+        String matchingStockPrice = null;
+
+        try {
+            // 외부 API 호출을 위한 URL 설정
+            String urlStr = "https://api.odcloud.kr/api/GetStockSecuritiesInfoService/v1/getStockPriceInfo?";
+            urlStr += "serviceKey=" + "1%2FWP%2BVc3M5kGU2bikqOuBl9hAtMQ7OeqB24EL0llGF9zC75kdgM1jbsTy90LiI9hmDwU7jeFjW8P%2B1VPFtc%2BDg%3D%3D";  // API 키를 적절하게 설정
+            urlStr += "&beginBasDt=" + frdt;
+            urlStr += "&endBasDt=" + todt;
+            urlStr += "&itmsNm=" + userSearchTerm;
+
+            URL obj = new URL(urlStr);
+            HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+            con.setRequestMethod("GET");
+
+            // API 응답 읽기
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF-8"))) {
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+
+                // 사용자 검색어와 일치하는 항목이 있는지 확인
+                if (response.toString().contains(userSearchTerm)) {
+                    matchingStockPrice = response.toString();
+                }
+            }
+        } finally {
+            // HttpURLConnection 리소스 닫기
+
+        }
+
+        return matchingStockPrice;
+    }
 
     private static void printStockPriceTable(StringBuffer xmlData) throws Exception {
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
@@ -204,16 +221,20 @@ class Panel3Action { // 관심주식
 
         NodeList itemList = doc.getElementsByTagName("item");
 
-        // 출력 행 구성
-        Node itemNode = itemList.item(0);
-        if (itemNode.getNodeType() == Node.ELEMENT_NODE) {
-            Element itemElement = (Element) itemNode;
-            row[2] = getValue("clpr", itemElement);
-            row[4] = getValue("vs", itemElement);
-            row[5] = getValue("fltRt", itemElement);
-            tableModel.addRow(row);
-        }
+        // 사용자가 입력한 관심 주식 데이터를 저장 (H2_PanelAction5.java에서 필요)
+        Panel3Action.userInterestStock = userInterestStock;
 
+        // 출력 행 구성
+        for (int i = 0; i < itemList.getLength(); i++) {
+            Node itemNode = itemList.item(i);
+            if (itemNode.getNodeType() == Node.ELEMENT_NODE) {
+                Element itemElement = (Element) itemNode;
+                row[2] = getValue("clpr", itemElement);
+                row[4] = getValue("vs", itemElement);
+                row[5] = getValue("fltRt", itemElement);
+                tableModel.addRow(row);
+            }
+        }
     }
 
     private static String getValue(String tag, Element element) {
@@ -238,6 +259,7 @@ class Panel3Action { // 관심주식
         inputPanel.add(searchButton);
 
         panel.add(BorderLayout.NORTH, inputPanel);
+        System.out.println(inputPanel);
 
         interestFrame.getContentPane().add(panel);
         interestFrame.setSize(400, 400);
@@ -246,40 +268,10 @@ class Panel3Action { // 관심주식
         interestFrame.setLayout(new BorderLayout());
 
         DefaultListModel<String> listModel = new DefaultListModel<>();
-        //스크롤이 되나 보려고 많이 넣어놓은 것
-        listModel.addElement("삼성");
-        listModel.addElement("삼성1");
-        listModel.addElement("삼성2");
-        listModel.addElement("삼성3");
-        listModel.addElement("삼성4");
-        listModel.addElement("삼성5");
-        listModel.addElement("삼성6");
-        listModel.addElement("삼성7");
-        listModel.addElement("삼성8");
-        listModel.addElement("삼성9");
-        listModel.addElement("삼성10");
-        listModel.addElement("삼성11");
-        listModel.addElement("삼성12");
-        listModel.addElement("삼성13");
-        listModel.addElement("삼성14");
-        listModel.addElement("삼성15");
-        listModel.addElement("삼성16");
-        listModel.addElement("삼성17");
-        listModel.addElement("삼성18");
-        listModel.addElement("삼성19");
-        listModel.addElement("삼성20");
-        listModel.addElement("삼성21");
-        listModel.addElement("삼성22");
-        listModel.addElement("삼성23");
-        listModel.addElement("현대");
 
         JList<String> searchList = new JList<>(listModel);
         JScrollPane scrollPane = new JScrollPane(searchList);
         panel.add(scrollPane, BorderLayout.CENTER); // Changed to CENTER
-
-        // 검색 리스트와 스크롤 패널 초기에는 보이지 않도록 설정
-        searchList.setVisible(false);
-        scrollPane.setVisible(false);
 
         text.getDocument().addDocumentListener(new DocumentListener() {
             @Override
@@ -297,7 +289,7 @@ class Panel3Action { // 관심주식
                 updateList();
             }
 
-            private void updateList() {
+            public void updateList() {
                 String searchText = text.getText().toLowerCase();
                 DefaultListModel<String> filteredModel = new DefaultListModel<>();
                 for (int i = 0; i < listModel.size(); i++) {
@@ -306,7 +298,7 @@ class Panel3Action { // 관심주식
                         filteredModel.addElement(item);
                     }
                 }
-                searchList.setModel(filteredModel);
+                searchList.setModel(filteredModel); // Set the model for searchList
                 searchList.setVisible(!searchText.isEmpty());
                 scrollPane.setVisible(!searchText.isEmpty());
             }
@@ -326,15 +318,240 @@ class Panel3Action { // 관심주식
 
                 // 테이블 모델에 추가되지 않은 경우에만 추가
                 if (!alreadyExists) {
-                    tableModel.addRow(new Object[]{selectedValue, "", "", "", "", "", ""});
+                    try {
+                        // Get the user input from the text field
+
+                        String searchKeyword = text.getText();
+
+                        // Encode the search term
+                        String encodedSearchTerm = URLEncoder.encode(searchKeyword, "UTF-8");
+
+                        // Get the last business day range
+                        String[] dateRange = getLastBusinessDayRange();
+                        String frdt = dateRange[0];
+                        String todt = dateRange[1];
+
+                        System.out.println(encodedSearchTerm);
+
+                        // Make the API request
+                        StringBuffer stockPriceData = getStockPriceWithDifferentParam(encodedSearchTerm, frdt, todt);
+
+                        if (stockPriceData.length() > 0) {
+                            // Update the UI based on the response
+                            System.out.println("Stock Price Data:\n" + stockPriceData.toString());
+                        } else {
+                            System.out.println("No stock price data available for the specified parameters.");
+                        }
+                    } catch (UnsupportedEncodingException ex) {
+
+                    } catch (Exception ex) {
+
+                    }
                 }
             }
         });
 
-        searchButton.addActionListener(e -> {
+        searchButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    // Get the user input from the text field
+                    String searchKeyword = text.getText();
 
-            searchList.setVisible(true);
-            scrollPane.setVisible(true);
-            interestFrame.revalidate();
+                    // Encode the search term
+                    String encodedSearchTerm = URLEncoder.encode(searchKeyword, "UTF-8");
+
+                    // Get the last business day range
+                    String[] dateRange = getLastBusinessDayRange();
+                    String frdt = dateRange[0];
+                    String todt = dateRange[1];
+
+                    // Make the API request
+                    StringBuffer stockPriceData = getStockPriceWithDifferentParam(encodedSearchTerm, frdt, todt);
+
+                    // 검색 버튼 클릭 시
+                    if (stockPriceData.length() > 0) {
+                        System.out.println(stockPriceData.toString());
+
+                        // XML 파싱
+                        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+                        DocumentBuilder builder = factory.newDocumentBuilder();
+                        InputSource is = new InputSource(new StringReader(stockPriceData.toString()));
+                        Document document = builder.parse(is);
+
+                        // "itmsNm" 태그에서 데이터 추출
+                        listModel.clear(); // 기존 항목 제거
+                        NodeList itemList = document.getElementsByTagName("item");
+                        for (int i = 0; i < itemList.getLength(); i++) {
+                            Element item = (Element) itemList.item(i);
+                            String itemName = item.getElementsByTagName("itmsNm").item(0).getTextContent();
+                            listModel.addElement(itemName);
+                            System.out.println("Added to list: " + itemName);
+                        }
+
+                            searchList.repaint(); // 검색 리스트를 다시 그리도록 강제로 repaint
+                            searchList.setVisible(true);
+                            scrollPane.setVisible(true);
+
+                    } else {
+                        System.out.println("No stock price data available for the specified parameters.");
+                    }
+                } catch (Exception ex) {
+                    // Handle all exceptions
+                } finally {
+                    System.out.println("Search button clicked!");
+                }
+            }
         });
-    }}
+
+        searchList.addListSelectionListener(e -> {
+            // 선택한 항목의 인덱스 가져오기
+            int[] selectedIndices = searchList.getSelectedIndices();
+
+            // 선택한 항목이 없으면 테이블 비우기
+            if (selectedIndices.length == 0) {
+                tableModel.setRowCount(0);
+                return;
+            }
+
+            // 기존 테이블 데이터 유지
+            int rowCount = tableModel.getRowCount();
+
+            // 선택한 항목들에 대해 각각 API 호출 및 결과를 테이블에 추가
+            for (int selectedIndex : selectedIndices) {
+                // 기존 테이블에 추가할 행 인덱스 계산
+                int rowIndex = rowCount + selectedIndex;
+
+                // 기존 테이블에 이미 해당 항목이 있는지 확인
+                boolean isDuplicate = false;
+                String selectedValue = listModel.getElementAt(selectedIndex);
+                for (int i = 0; i < rowCount; i++) {
+                    String existingValue = (String) tableModel.getValueAt(i, 0);
+                    if (selectedValue.equals(existingValue)) {
+                        isDuplicate = true;
+                        break;
+                    }
+                }
+
+                // 중복이 아닌 경우에만 행 추가
+                if (!isDuplicate && rowIndex >= tableModel.getRowCount()) {
+                    try {
+                        // 수정된 부분: 검색어 대신 사용자가 선택한 항목의 텍스트 사용
+                        String selectedItemText = selectedValue;
+
+                        // Encode the search term
+                        String encodedSearchTerm = URLEncoder.encode(selectedItemText, "UTF-8");
+
+                        // 마지막 영업일 범위 가져오기
+                        String[] dateRange = getLastBusinessDayRange();
+                        String frdt = dateRange[0];
+                        String todt = dateRange[1];
+
+                        // API 요청
+                        StringBuffer stockPriceData = getStockPriceWithDifferentParam(encodedSearchTerm, frdt, todt);
+
+                        if (stockPriceData.length() > 0) {
+                            // 응답을 기반으로 UI 업데이트
+                            System.out.println("주식 가격 데이터:\n" + stockPriceData.toString());
+
+                            // XML 파싱
+                            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+                            DocumentBuilder builder = factory.newDocumentBuilder();
+                            InputSource is = new InputSource(new StringReader(stockPriceData.toString()));
+                            Document document = builder.parse(is);
+
+                            // "itmsNm" 태그에서 데이터 추출
+                            NodeList itemList = document.getElementsByTagName("item");
+
+                            // 수정된 부분: 첫 번째 결과만 가져와서 추가
+                            if (itemList.getLength() > 0) {
+                                Element item = (Element) itemList.item(0);
+                                row[0] = item.getElementsByTagName("itmsNm").item(0).getTextContent();
+                                row[1] = item.getElementsByTagName("srtnCd").item(0).getTextContent();
+                                row[2] = item.getElementsByTagName("clpr").item(0).getTextContent();
+                                row[3] = item.getElementsByTagName("clpr").item(0).getTextContent();
+                                row[4] = item.getElementsByTagName("vs").item(0).getTextContent();
+                                row[5] = item.getElementsByTagName("fltRt").item(0).getTextContent();
+
+                                // 새로운 행 추가
+                                tableModel.addRow(row);
+                            }
+                        } else {
+                            System.out.println("No stock price data available for the specified parameters.");
+                        }
+                    } catch (ParserConfigurationException | SAXException | IOException ex) {
+                        ex.printStackTrace();
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            }
+        });
+
+
+        // 검색 리스트의 선택 이벤트 핸들러
+        searchList.addListSelectionListener(e -> {
+            String selectedValue = searchList.getSelectedValue();
+            if (selectedValue != null) {
+                // 테이블 모델에 추가되지 않은 경우에만 추가
+                boolean alreadyExists = false;
+                for (int i = 0; i < tableModel.getRowCount(); i++) {
+                    if (selectedValue.equals(tableModel.getValueAt(i, 0))) {
+                        alreadyExists = true;
+                        break;
+                    }
+                }
+
+                if (!alreadyExists) {
+                    try {
+                        // Get the user input from the text field
+                        String searchKeyword = text.getText();
+
+                        // Encode the search term
+                        String encodedSearchTerm = URLEncoder.encode(searchKeyword, "UTF-8");
+
+                        // Get the last business day range
+                        String[] dateRange = getLastBusinessDayRange();
+                        String frdt = dateRange[0];
+                        String todt = dateRange[1];
+
+                        // Make the API request
+                        String stockPriceData = getStockPrice(encodedSearchTerm, frdt, todt);
+
+                        if (stockPriceData.length() > 0) {
+                            // Update the UI based on the response
+                            System.out.println("Stock Price Data:\n" + stockPriceData.toString());
+
+                            // XML 파싱
+                            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+                            DocumentBuilder builder = factory.newDocumentBuilder();
+                            InputSource is = new InputSource(new StringReader(stockPriceData.toString()));
+                            Document document = builder.parse(is);
+
+                            // "itmsNm" 태그에서 데이터 추출
+                            NodeList itemList = document.getElementsByTagName("item");
+                            for (int i = 0; i < itemList.getLength(); i++) {
+                                Element item = (Element) itemList.item(i);
+                                row[0] = item.getElementsByTagName("itmsNm").item(0).getTextContent();
+                                row[2] = item.getElementsByTagName("clpr").item(0).getTextContent();
+                                row[4] = item.getElementsByTagName("vs").item(0).getTextContent();
+                                row[5] = item.getElementsByTagName("fltRt").item(0).getTextContent();
+
+                                // Add a new row to the table model (기존 코드에서 주석 처리된 부분 해제)
+                                tableModel.addRow(row);
+                            }
+                        } else {
+                            System.out.println("No stock price data available for the specified parameters.");
+                        }
+                    } catch (ParserConfigurationException | SAXException | IOException ex) {
+                        ex.printStackTrace();
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }
+            }
+        });
+    }
+
+
+}
