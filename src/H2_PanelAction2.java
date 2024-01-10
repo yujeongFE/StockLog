@@ -16,8 +16,10 @@ import java.net.URL;
 public class H2_PanelAction2 extends JPanel {
 
     public H2_PanelAction2(String stockName, DefaultCategoryDataset dataset) {
+
+        String chartTitle = "Time Series (1Min)";
         JFreeChart chart = ChartFactory.createLineChart(
-                "분봉차트 - " + stockName, // 차트 제목
+                chartTitle, // 차트 제목
                 "Time", // x축 레이블
                 "Closing Price", // y축 레이블
                 dataset
@@ -32,7 +34,7 @@ public class H2_PanelAction2 extends JPanel {
         // 차트 생성 및 표시
         SwingUtilities.invokeLater(() -> {
             H2_PanelAction2 chartApp = new H2_PanelAction2(stockName, dataset);
-            JFrame frame = new JFrame("Minute Chart Example");
+            JFrame frame = new JFrame("Intraday chart"); // 프레임을 새로 생성
             frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
             frame.getContentPane().add(chartApp);
             frame.setSize(800, 600);
@@ -50,7 +52,12 @@ public class H2_PanelAction2 extends JPanel {
     }
 
     private static DefaultCategoryDataset fetchData(String stockName, String interval) {
-        String apiKey = "ZM0OCCQ902KM00LJ";
+        // stockName이 비어있으면 기본값 "AAPL" 설정
+        if (stockName == null || stockName.isEmpty()) {
+            stockName = "AAPL";
+        }
+
+        String apiKey = "H82GV03TBEHBQRNB";
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 
         try {
@@ -78,7 +85,17 @@ public class H2_PanelAction2 extends JPanel {
             JsonObject jsonResponse = JsonParser.parseString(response.toString()).getAsJsonObject();
 
             // 시계열 데이터에 해당하는 부분 가져오기
-            JsonObject timeSeriesData = jsonResponse.getAsJsonObject("Time Series (1Min)");
+            //JsonObject timeSeriesData = jsonResponse.getAsJsonObject("Time Series (1Min)");
+
+            JsonObject timeSeriesData = jsonResponse.getAsJsonObject("Time Series (Daily)");
+
+
+            // 에러 처리: Time Series (1Min)이 없으면 종료
+if (timeSeriesData == null) {
+                System.out.println("Error: 'Time Series (1Min)' not found in API response.");
+                return dataset;
+            }
+
 
             // 가져온 데이터를 데이터셋에 추가
             for (String time : timeSeriesData.keySet()) {
@@ -90,5 +107,16 @@ public class H2_PanelAction2 extends JPanel {
         }
 
         return dataset;
+    }
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            JFrame frame = new JFrame("Test");
+            JPanel panel = new JPanel();
+            H2_PanelAction2_1.addFunctionality(panel, null); // stockName이 없는 경우
+            frame.add(panel);
+            frame.setSize(800, 600);
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.setVisible(true);
+        });
     }
 }
