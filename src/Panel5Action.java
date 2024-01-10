@@ -89,7 +89,6 @@ class Panel5Action { // 주식 매매 기록
 
                         // 여기서 선택된 행의 데이터를 얻을 수 있어요.
                         String stockName = (String) tableModel.getValueAt(row, 0); // 종목명은 첫 번째 열(인덱스 0)
-                        // System.out.println(stockName);
                         new Home2(userId, stockName); // 종목명을 이용해 페이지를 열거나 처리하는 함수 호출
                     }
                 }
@@ -137,7 +136,7 @@ class Panel5Action { // 주식 매매 기록
         SellBuyFrame.setVisible(true);
         SellBuyFrame.setLayout(new BorderLayout());
 
-        // Add ActionListener to the searchButton
+
         searchButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -206,7 +205,7 @@ class Panel5Action { // 주식 매매 기록
                 return;
             }
 
-            
+
             JPanel searchResultsPanel = new JPanel(new GridLayout(itemList.getLength(), 1));
 
             for (int i = 0; i < itemList.getLength(); i++) {
@@ -215,14 +214,14 @@ class Panel5Action { // 주식 매매 기록
                     Element itemElement = (Element) itemNode;
                     String itemName = itemElement.getElementsByTagName("itmsNm").item(0).getTextContent();
 
-                   
+
                     JLabel resultLabel = new JLabel(itemName);
 
-                  
+
                     resultLabel.addMouseListener(new java.awt.event.MouseAdapter() {
                         public void mouseClicked(java.awt.event.MouseEvent evt) {
-                           
-                            handleResultLabelClick(itemElement, resultLabel); 
+
+                            handleResultLabelClick(itemElement, resultLabel);
                         }
                     });
 
@@ -230,14 +229,14 @@ class Panel5Action { // 주식 매매 기록
                 }
             }
 
-          
+
             JFrame resultsFrame = new JFrame("검색 결과");
             resultsFrame.setLayout(new BorderLayout());
             resultsFrame.setSize(200, 200);
 
             resultsFrame.add(searchResultsPanel, BorderLayout.SOUTH);
 
-            
+
             resultsFrame.setVisible(true);
 
         } catch (Exception e) {
@@ -247,13 +246,10 @@ class Panel5Action { // 주식 매매 기록
     }
 
     private static void handleResultLabelClick(Element itemElement, JLabel resultLabel) {
-// 이 부분에서 검색 결과 항목을 클릭했을 때 수행할 동작을 구현해주세요.
         resultLabel.setForeground(Color.BLUE);
-// Create and set up the SellBuy frame
         SellBuy sb = new SellBuy();
         sb.setFrame(sb);
-
-
-
-
+        String selectedStockName = itemElement.getElementsByTagName("itmsNm").item(0).getTextContent();
+        sb.setSelectedStockName(selectedStockName);
+        sb.openFrame(selectedStockName);
     }}
