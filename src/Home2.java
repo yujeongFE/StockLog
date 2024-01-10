@@ -113,19 +113,19 @@ public class Home2 {
 
         frame.add(bottomPanel, BorderLayout.SOUTH);
 
+
         // 패널에 기능 추가
         PanelAction1.addFunctionality(topLeftPanel); // 패널 1에 기능 추가
-        //H2_PanelAction2.addFunctionality(topRightPanel1); // 패널 2에 기능 추가
-        PanelAction2_1.addFunctionality(topRightPanel2); // 패널 2-1에 기능 추가
+        H2_PanelAction2.addFunctionality(topRightPanel1,stockName); // 패널 2에 기능 추가
+        H2_PanelAction2_1.addFunctionality(topRightPanel2,stockName); // 패널 2-1에 기능 추가
         PanelAction3.addFunctionality(bottomLeftPanel, userId); // 관심 주식 표시
         PanelAction4.addFunctionality(bottomRightPanel, userId); // 보유 주식 표시
         H2_PanelAction5.addFunctionality(rightPanel1, stockName); // 패널 5에 기능 추가
-        // PanelAction5.addFunctionality(rightPanel1);
         PanelAction6.addFunctionality(rightBottomPanel, userId, stockName); // 패널 6에 기능 추가
         PanelAction7.addFunctionality(bottomPanel); // 하단 바에 기능 추가
 
-        // 패널 5-1에 기능 추가 // 다시 활성화해야함
-        // H2_PanelAction5_1.addFunctionality(rightPanel2, bottomLeftPanel);
+        // 패널 5-1에 기능 추가
+        H2_PanelAction5_1.addFunctionality(rightPanel2);
 
         gbc.gridx = 0;
         gbc.gridy = 0;
