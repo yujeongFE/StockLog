@@ -388,16 +388,21 @@ class Panel3Action { // 관심주식
                             listModel.addElement(itemName);
                             System.out.println("Added to list: " + itemName);
                         }
+                        DefaultListModel<String> newModel = new DefaultListModel<>();
+                        for (int i = 0; i < listModel.size(); i++) {
+                            newModel.addElement(listModel.getElementAt(i));
+                        }
+                        searchList.setModel(newModel);  // 새로운 모델로 업데이트
 
-                            searchList.repaint(); // 검색 리스트를 다시 그리도록 강제로 repaint
-                            searchList.setVisible(true);
-                            scrollPane.setVisible(true);
-
+                        // 변경된 부분: 검색 리스트를 다시 그리도록 강제로 repaint
+                        searchList.repaint();
+                        searchList.setVisible(true);
+                        scrollPane.setVisible(true);
                     } else {
                         System.out.println("No stock price data available for the specified parameters.");
                     }
                 } catch (Exception ex) {
-                    // Handle all exceptions
+                    ex.printStackTrace();
                 } finally {
                     System.out.println("Search button clicked!");
                 }
