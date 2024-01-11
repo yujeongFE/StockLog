@@ -272,6 +272,8 @@ class Panel3Action { // 관심주식
         JList<String> searchList = new JList<>(listModel);
         JScrollPane scrollPane = new JScrollPane(searchList);
         panel.add(scrollPane, BorderLayout.CENTER); // Changed to CENTER
+        searchList.setVisible(true);
+        scrollPane.setVisible(true);
 
         text.getDocument().addDocumentListener(new DocumentListener() {
             @Override
