@@ -1,6 +1,11 @@
-/*
 package stocklogmanipulation;
+import org.apache.poi.ss.usermodel.*;
+//import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import javax.swing.*;
+import java.awt.*;
+import java.io.File;
+import java.io.FileInputStream;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.jfree.chart.ChartFactory;
@@ -8,21 +13,17 @@ import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.category.DefaultCategoryDataset;
 
-import javax.swing.*;
-import java.awt.*;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import static stocklogmanipulation.Home2.stockName;
 
-public class H2_PanelAction2_1 extends JPanel {
 
-    public H2_PanelAction2_1(String stockName, DefaultCategoryDataset dataset) {
+class H2_PanelAction2_1 extends JPanel {
+
+    public H2_PanelAction2_1(DefaultCategoryDataset dataset) {
+        String chartTitle = "Comparison Chart";
         JFreeChart chart = ChartFactory.createLineChart(
-                "일봉차트 - " + stockName, // 차트 제목
+                chartTitle, // 차트 제목
                 "Time", // x축 레이블
-                "Closing Price", // y축 레이블
+                "Value", // y축 레이블
                 dataset
         );
 
@@ -31,11 +32,11 @@ public class H2_PanelAction2_1 extends JPanel {
         add(chartPanel);
     }
 
-    public static void createChart(String stockName, DefaultCategoryDataset dataset) {
+    public static void createChart(DefaultCategoryDataset dataset) {
         // 차트 생성 및 표시
         SwingUtilities.invokeLater(() -> {
-            H2_PanelAction2_1 chartApp = new H2_PanelAction2_1(stockName, dataset);
-            JFrame frame = new JFrame("Daily Chart Example");
+            H2_PanelAction2 chartApp = new H2_PanelAction2(dataset);
+            JFrame frame = new JFrame("Comparison Chart");
             frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
             frame.getContentPane().add(chartApp);
             frame.setSize(800, 600);
@@ -46,52 +47,83 @@ public class H2_PanelAction2_1 extends JPanel {
 
     public static void addFunctionality(JPanel panel, String stockName) {
         // 패널에 차트를 추가하는 기능
-        DefaultCategoryDataset dataset = fetchData(stockName);
-        createChart(stockName, dataset);
-        panel.add(new H2_PanelAction2_1(stockName, dataset));
+        DefaultCategoryDataset dataset = fetchDataFromExcel(stockName);
+        createChart(dataset);
+        panel.add(new H2_PanelAction2(dataset));
     }
 
-    private static DefaultCategoryDataset fetchData(String stockName) {
-        String apiKey = "ZM0OCCQ902KM00LJ";
+    private static DefaultCategoryDataset fetchDataFromExcel(String stockName) {
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 
         try {
-            // API 엔드포인트 및 요청 URL 생성
-            String apiUrl = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=" + stockName + "&apikey=" + apiKey;
-            URL url = new URL(apiUrl);
+            // 엑셀 파일 경로 설정
+            String excelFilePath = "C:/Users/tori0/Downloads/주식시세.xls";
 
-            // HTTP 요청 보내기
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
 
-            // 응답 읽기
-            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            String line;
-            StringBuilder response = new StringBuilder();
+            // 엑셀 파일 열기
+            FileInputStream inputStream = new FileInputStream(new File(excelFilePath));
+            Workbook workbook = WorkbookFactory.create(inputStream);
 
-            while ((line = reader.readLine()) != null) {
-                response.append(line);
+            // 첫 번째 시트 가져오기
+            Sheet sheet = workbook.getSheetAt(0);
+
+            // 열 인덱스
+            int stockNameColumnIndex = 3;
+            int timeColumnIndex = 0;
+            int basePriceColumnIndex = 5; // 6행
+            int lowPriceColumnIndex = 7; // 7행
+            int highPriceColumnIndex = 10; // 8행
+
+            // 각 행 반복
+            for (Row row : sheet) {
+                // 특정 열의 값 가져오기 (stockNameColumnIndex에 해당하는 열)
+                Cell stockNameCell = row.getCell(stockNameColumnIndex);
+                if (stockNameCell != null && stockNameCell.getCellType() == CellType.STRING) {
+                    String cellValue = stockNameCell.getStringCellValue();
+
+                    // 주어진 stockName과 일치하는 경우에만 데이터셋에 추가
+                    if (cellValue.equals(stockName)) {
+                        // 시간과 기준가, 시가, 종가 데이터를 추출하여 데이터셋에 추가
+                        Cell timeCell = row.getCell(timeColumnIndex);
+                        Cell basePriceCell = row.getCell(basePriceColumnIndex);
+                        Cell lowPriceCell = row.getCell(lowPriceColumnIndex);
+                        Cell highPriceCell = row.getCell(highPriceColumnIndex);
+
+                        if (timeCell != null && basePriceCell != null && lowPriceCell != null && highPriceCell != null) {
+                            String time = timeCell.getStringCellValue();
+                            double basePrice = basePriceCell.getNumericCellValue();
+                            double lowPrice = lowPriceCell.getNumericCellValue();
+                            double highPrice = highPriceCell.getNumericCellValue();
+
+                            // 데이터셋에 추가
+                            dataset.addValue(basePrice, "Base Price", time);
+                            dataset.addValue(lowPrice, "Opening Price", time);
+                            dataset.addValue(highPrice, "CLosing Price", time);
+                        }
+                    }
+                }
             }
 
-            reader.close();
-            connection.disconnect();
+            // 엑셀 파일 닫기
+            workbook.close();
+            inputStream.close();
 
-            // 응답을 JSON으로 파싱
-            JsonObject jsonResponse = JsonParser.parseString(response.toString()).getAsJsonObject();
-
-            // 시계열 데이터에 해당하는 부분 가져오기
-            JsonObject timeSeriesData = jsonResponse.getAsJsonObject("Time Series (Daily)");
-
-            // 가져온 데이터를 데이터셋에 추가
-            for (String date : timeSeriesData.keySet()) {
-                String closingPrice = timeSeriesData.getAsJsonObject(date).get("4. close").getAsString();
-                dataset.addValue(Double.parseDouble(closingPrice), "Closing Price", date);
-            }
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
         return dataset;
     }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            JFrame frame = new JFrame("Test");
+            JPanel panel = new JPanel();
+            H2_PanelAction2.addFunctionality(panel,stockName);
+            frame.add(panel);
+            frame.setSize(800, 600);
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.setVisible(true);
+        });
+    }
 }
-*/

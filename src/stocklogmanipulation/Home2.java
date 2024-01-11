@@ -123,7 +123,7 @@ public class Home2 {
         H2_PanelAction5_1.addFunctionality(rightPanel2);
 
         JPanel panel11_1 = new JPanel();
-        panel11_1.setLayout(new GridLayout(1, 2));
+        panel11_1.setLayout(new GridLayout(2, 1));
         panel11_1.add(topLeftPanel);
         panel11_1.add(topLeftPanel2);
 
@@ -149,6 +149,7 @@ public class Home2 {
         // 패널 5와 패널 5-1 설정
         gbc.gridx = 2;
         gbc.gridy = 0;
+        gbc.weightx = 0.1;
         mainPanel.add(panel55_1, gbc);
 
         // 패널 6 설정

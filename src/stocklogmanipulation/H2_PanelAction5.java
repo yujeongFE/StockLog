@@ -27,11 +27,14 @@ class H2_PanelAction5 {
             JOptionPane.showMessageDialog(null, "Please enter a valid stock symbol.");
         }
 
+        JLabel label = new JLabel("관련 뉴스", SwingConstants.CENTER);
+        panel.add(label, BorderLayout.NORTH);
+
         newsTextArea = new JTextArea();
         newsTextArea.setEditable(false);  // 편집 불가능하도록 설정
 
         // 패널에 레이아웃을 BorderLayout으로 설정
-        panel.setLayout(new BorderLayout());
+        // panel.setLayout(new BorderLayout());
 
         // JScrollPane을 생성하고 JTextArea를 넣어줌
         JScrollPane scrollPane = new JScrollPane(newsTextArea);
