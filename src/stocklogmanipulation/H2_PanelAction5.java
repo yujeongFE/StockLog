@@ -12,9 +12,10 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 class H2_PanelAction5 {
-    // private static JButton searchButton;
     private static JTextArea newsTextArea;
 
     public static void addFunctionality(JPanel panel, String stockName) {
@@ -26,47 +27,11 @@ class H2_PanelAction5 {
             JOptionPane.showMessageDialog(null, "Please enter a valid stock symbol.");
         }
 
-        // searchButton = new JButton("검색");
-
-        /*// 검색 버튼의 ActionListener에서 사용자로부터 주식 기호를 입력 받지 않고,
-        // 바로 Panel3Action에서 저장한 주식 기호를 사용하도록 수정
-        searchButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (stockName != null && !stockName.isEmpty()) {
-                    // 검색 창의 텍스트를 사용하여 뉴스 검색 수행
-                    performNewsSearch(stockName, panel);
-                } else {
-                    JOptionPane.showMessageDialog(null, "Please enter a valid stock symbol.");
-                }
-            }
-        });
-
-        // 검색 버튼의 ActionListener에서 사용자로부터 주식 기호를 입력 받지 않고,
-        // 바로 패널에 있는 검색 창의 텍스트를 사용하도록 수정
-        searchButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                // 사용자로부터 주식 기호를 입력 받지 않고,
-                // 바로 패널에 있는 검색 창의 텍스트를 사용
-                String userInterestStock = JOptionPane.showInputDialog("Enter the stock you are interested in:");
-                if (userInterestStock != null && !userInterestStock.isEmpty()) {
-                    // 검색 창의 텍스트를 사용하여 뉴스 검색 수행
-                    performNewsSearch(userInterestStock, panel);
-                } else {
-                    JOptionPane.showMessageDialog(null, "Please enter a valid stock symbol.");
-                }
-            }
-        });*/
-
         newsTextArea = new JTextArea();
         newsTextArea.setEditable(false);  // 편집 불가능하도록 설정
 
         // 패널에 레이아웃을 BorderLayout으로 설정
         panel.setLayout(new BorderLayout());
-
-        /*// 패널에 검색 버튼 추가
-        panel.add(searchButton, BorderLayout.NORTH);*/
 
         // JScrollPane을 생성하고 JTextArea를 넣어줌
         JScrollPane scrollPane = new JScrollPane(newsTextArea);

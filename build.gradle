@@ -9,6 +9,7 @@ dependencies {
     implementation 'com.googlecode.json-simple:json-simple:1.1.1'
     implementation 'com.google.code.gson:gson:2.8.9'
     implementation 'org.jsoup:jsoup:1.14.3'
+    implementation 'org.json:json:20231013'
     // Jackson Core
     implementation 'com.fasterxml.jackson.core:jackson-core:2.13.1'
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.16.1'
@@ -16,3 +17,5 @@ dependencies {
 
 
 }
+
+

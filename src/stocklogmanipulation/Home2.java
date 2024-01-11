@@ -120,7 +120,7 @@ public class Home2 {
         PanelAction7.addFunctionality(bottomPanel); // 하단 바에 기능 추가
 
         // 패널 5-1에 기능 추가
-        // H2_PanelAction5_1.addFunctionality(rightPanel2);
+        H2_PanelAction5_1.addFunctionality(rightPanel2);
 
         JPanel panel11_1 = new JPanel();
         panel11_1.setLayout(new GridLayout(1, 2));
