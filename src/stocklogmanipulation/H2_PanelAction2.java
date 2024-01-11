@@ -1,3 +1,4 @@
+/*
 package stocklogmanipulation;
 
 import com.google.gson.JsonObject;
@@ -122,3 +123,4 @@ if (timeSeriesData == null) {
         });
     }
 }
+*/

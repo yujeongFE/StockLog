@@ -249,7 +249,6 @@ class Panel3Action { // 관심주식
         Panel3Action.userInterestStock = userInterestStock;
 
         // 출력 행 구성
-        // 출력 행 구성 (첫 번째 아이템만 추가)
         if (itemList.getLength() > 0) {
             Node itemNode = itemList.item(0);
             if (itemNode.getNodeType() == Node.ELEMENT_NODE) {
