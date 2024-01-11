@@ -1,3 +1,6 @@
+/*
+package stocklogmanipulation;
+
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.jfree.chart.ChartFactory;
@@ -91,3 +94,4 @@ public class H2_PanelAction2_1 extends JPanel {
         return dataset;
     }
 }
+*/

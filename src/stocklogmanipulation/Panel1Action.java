@@ -1,3 +1,5 @@
+package stocklogmanipulation;
+
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -23,7 +25,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
-class PanelAction1 { // 종목 지수
+class Panel1Action { // 종목 지수
     public static void addFunctionality(JPanel panel) {
         try {
             // 시작 및 종료 날짜를 Unix 타임스탬프로 변환
@@ -171,4 +173,3 @@ class PanelAction1 { // 종목 지수
         return date.getTime() / 1000;
     }
 }
-
