@@ -14,16 +14,21 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 class H2_PanelAction5 {
-    private static JButton searchButton;
+    // private static JButton searchButton;
     private static JTextArea newsTextArea;
 
     public static void addFunctionality(JPanel panel, String stockName) {
         // 패널 5에 추가할 기능 구현
-        searchButton = new JButton("검색");
+        if (stockName != null && !stockName.isEmpty()) {
+            // 검색 창의 텍스트를 사용하여 뉴스 검색 수행
+            performNewsSearch(stockName, panel);
+        } else {
+            JOptionPane.showMessageDialog(null, "Please enter a valid stock symbol.");
+        }
 
+        // searchButton = new JButton("검색");
 
-
-        // 검색 버튼의 ActionListener에서 사용자로부터 주식 기호를 입력 받지 않고,
+        /*// 검색 버튼의 ActionListener에서 사용자로부터 주식 기호를 입력 받지 않고,
         // 바로 Panel3Action에서 저장한 주식 기호를 사용하도록 수정
         searchButton.addActionListener(new ActionListener() {
             @Override
@@ -36,7 +41,6 @@ class H2_PanelAction5 {
                 }
             }
         });
-
 
         // 검색 버튼의 ActionListener에서 사용자로부터 주식 기호를 입력 받지 않고,
         // 바로 패널에 있는 검색 창의 텍스트를 사용하도록 수정
@@ -53,7 +57,7 @@ class H2_PanelAction5 {
                     JOptionPane.showMessageDialog(null, "Please enter a valid stock symbol.");
                 }
             }
-        });
+        });*/
 
         newsTextArea = new JTextArea();
         newsTextArea.setEditable(false);  // 편집 불가능하도록 설정
@@ -61,8 +65,8 @@ class H2_PanelAction5 {
         // 패널에 레이아웃을 BorderLayout으로 설정
         panel.setLayout(new BorderLayout());
 
-        // 패널에 검색 버튼 추가
-        panel.add(searchButton, BorderLayout.NORTH);
+        /*// 패널에 검색 버튼 추가
+        panel.add(searchButton, BorderLayout.NORTH);*/
 
         // JScrollPane을 생성하고 JTextArea를 넣어줌
         JScrollPane scrollPane = new JScrollPane(newsTextArea);
@@ -75,28 +79,29 @@ class H2_PanelAction5 {
         String apiKey = "1277dcdf93f8462a96f2efd5778607ae";
         String apiUrl = "https://newsapi.org/v2/everything?q=" + userInterestStock + "&apiKey=" + apiKey;
 
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    URL url = new URL(apiUrl);
-                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                    connection.setRequestMethod("GET");
+        try {
+            URL url = new URL(apiUrl);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
 
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                    String line;
-                    StringBuilder response = new StringBuilder();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            String line;
+            StringBuilder response = new StringBuilder();
 
-                    while ((line = reader.readLine()) != null) {
-                        response.append(line);
-                    }
+            while ((line = reader.readLine()) != null) {
+                response.append(line);
+            }
 
-                    reader.close();
-                    connection.disconnect();
+            reader.close();
+            connection.disconnect();
 
-                    // JSON 파싱을 통해 필요한 정보 추출
-                    String newsTable = parseJson(response.toString());
+            // JSON 파싱을 통해 필요한 정보 추출
+            String newsTable = parseJson(response.toString());
 
+            // EDT에서 UI 업데이트 코드 실행
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
                     // JTextArea에 뉴스 정보 설정
                     newsTextArea.setText(newsTable);
 
@@ -106,17 +111,17 @@ class H2_PanelAction5 {
                     // 패널을 다시 그리도록 갱신
                     panel.revalidate();
                     panel.repaint();
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                    // 사용자에게 알림
-                    JOptionPane.showMessageDialog(null, "Error: Unable to fetch news data. Please check your internet connection.");
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                    // 사용자에게 알림
-                    JOptionPane.showMessageDialog(null, "An unexpected error occurred. Please try again later.");
                 }
-            }
-        });
+            });
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            // 사용자에게 알림
+            JOptionPane.showMessageDialog(null, "Error: Unable to fetch news data. Please check your internet connection.");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            // 사용자에게 알림
+            JOptionPane.showMessageDialog(null, "An unexpected error occurred. Please try again later.");
+        }
     }
 
     private static String parseJson(String jsonString) {
@@ -151,7 +156,7 @@ class H2_PanelAction5 {
 
         // 표 형식으로 데이터 정리
         StringBuilder newsTable = new StringBuilder();
-        newsTable.append(String.format("%-50s%-100s%-30s%n", "Title", "Description", "Author"));
+        newsTable.append(String.format("%-70s%-120s%-45s%n", "기사 제목", "기사 내용", "기자 이름"));
 
         int maxSize = Math.max(Math.max(titles.size(), descriptions.size()), authors.size());
         for (int i = 0; i < maxSize; i++) {
