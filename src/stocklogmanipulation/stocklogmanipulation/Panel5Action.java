@@ -1,8 +1,5 @@
 package stocklogmanipulation;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -34,6 +31,9 @@ class Panel5Action { // 주식 매매 기록
     static Object[] row = new Object[8];
     static DefaultTableModel tableModel = new DefaultTableModel();
 
+    // Declare searchList as a class field
+    private static JList<String> searchList;
+
     public static void addFunctionality(JPanel panel, String userId) {
         DBconnection dbConnector = new DBconnection();
         Connection connection = dbConnector.getConnection();
@@ -50,7 +50,7 @@ class Panel5Action { // 주식 매매 기록
             tableModel.addColumn("날짜");
             tableModel.addColumn("주식 단가");
             tableModel.addColumn("수량");
-            tableModel.addColumn("수익률");
+            tableModel.addColumn("매매비용(세금, 수수료)");
             tableModel.addColumn("메모");
 
             while (resultSet.next()) {
@@ -83,14 +83,13 @@ class Panel5Action { // 주식 매매 기록
             table.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    if (e.getClickCount() == 1) { // 클릭 확인
+                    if (e.getClickCount() == 1) {
                         JTable target = (JTable) e.getSource();
                         int row = target.getSelectedRow();
 
                         // 여기서 선택된 행의 데이터를 얻을 수 있어요.
-                        String stockName = (String) tableModel.getValueAt(row, 0); // 종목명은 첫 번째 열(인덱스 0)
-                        // System.out.println(stockName);
-                        new Home2(userId, stockName); // 종목명을 이용해 페이지를 열거나 처리하는 함수 호출
+                        String stockName = (String) tableModel.getValueAt(row, 0);
+                        new Home2(userId, stockName);
                     }
                 }
             });
@@ -113,7 +112,7 @@ class Panel5Action { // 주식 매매 기록
         }
     }
 
-    private static void SellBuyFrame() {
+    public static void SellBuyFrame() {
         JFrame SellBuyFrame = new JFrame("매도/매수 기록 추가");
         SellBuyFrame.setLocation(800, 400);
         JPanel panel = new JPanel();
@@ -122,53 +121,58 @@ class Panel5Action { // 주식 매매 기록
         JPanel inputPanel = new JPanel();
         JLabel l1 = new JLabel();
         JTextField text = new JTextField(15);
-        JButton searchButton = new JButton("검색");
 
+        // Create a DefaultListModel to store search results
+        DefaultListModel<String> listModel = new DefaultListModel<>();
+
+        searchList = new JList<>(listModel);
+        JScrollPane scrollPane = new JScrollPane(searchList);
+        panel.add(scrollPane, BorderLayout.CENTER);
+        searchList.setVisible(true);
+        scrollPane.setVisible(true);
+
+        JButton searchButton = new JButton("검색");
         inputPanel.add(l1);
         inputPanel.add(text);
         inputPanel.add(searchButton);
 
-        panel.add(BorderLayout.CENTER, inputPanel);
-        panel.add(BorderLayout.SOUTH, new JLabel());
+        panel.add(BorderLayout.NORTH, inputPanel);
 
-        SellBuyFrame.getContentPane().add(panel);
-        SellBuyFrame.setSize(400, 400);
-        SellBuyFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        SellBuyFrame.setVisible(true);
-        SellBuyFrame.setLayout(new BorderLayout());
-
-        // Add ActionListener to the searchButton
         searchButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String searchTerm = text.getText();
                 if (!searchTerm.isEmpty()) {
-                    performSearch(searchTerm);
+                    performSearch(searchTerm, listModel);
+                    searchList.setModel(listModel);
                 } else {
                     JOptionPane.showMessageDialog(SellBuyFrame, "Please enter a search term.");
                 }
             }
         });
+
+        // Add mouse click event listener for searchList
+        searchList.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 1) {
+                    int index = searchList.locationToIndex(e.getPoint());
+                    if (index >= 0) {
+                        String selectedStockName = searchList.getModel().getElementAt(index);
+                        handleResultLabelClick(selectedStockName);
+                    }
+                }
+            }
+        });
+
+        SellBuyFrame.getContentPane().add(panel);
+        SellBuyFrame.setSize(400, 400);
+        SellBuyFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        SellBuyFrame.setVisible(true);
+        SellBuyFrame.setLayout(new BoxLayout(SellBuyFrame.getContentPane(), BoxLayout.Y_AXIS));
     }
 
-    private static String[] getLastBusinessDayRange() {
-        Calendar calendar = Calendar.getInstance();
-        int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
-        if (dayOfWeek == Calendar.SATURDAY) {
-            calendar.add(Calendar.DAY_OF_MONTH, -1);
-        } else if (dayOfWeek == Calendar.SUNDAY) {
-            calendar.add(Calendar.DAY_OF_MONTH, -2);
-        }
-
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
-        String todt = dateFormat.format(calendar.getTime());
-        calendar.add(Calendar.MONTH, -1);
-        String frdt = dateFormat.format(calendar.getTime());
-
-        return new String[]{frdt, todt};
-    }
-
-    private static void performSearch(String searchTerm) {
+    private static void performSearch(String searchTerm, DefaultListModel<String> listModel) {
         try {
             String[] dateRange = getLastBusinessDayRange();
             String frdt = dateRange[0];
@@ -200,45 +204,19 @@ class Panel5Action { // 주식 매매 기록
 
             NodeList itemList = document.getElementsByTagName("item");
 
-            // 검색결과가 0인 경우
             if (itemList.getLength() == 0) {
                 JOptionPane.showMessageDialog(null, "검색 결과가 없습니다.");
                 return;
             }
-
-            // 패널에 결과값 추가
-            JPanel searchResultsPanel = new JPanel(new GridLayout(itemList.getLength(), 1));
 
             for (int i = 0; i < itemList.getLength(); i++) {
                 Node itemNode = itemList.item(i);
                 if (itemNode.getNodeType() == Node.ELEMENT_NODE) {
                     Element itemElement = (Element) itemNode;
                     String itemName = itemElement.getElementsByTagName("itmsNm").item(0).getTextContent();
-
-                    // 검색 결과 항목마다 라벨 생성
-                    JLabel resultLabel = new JLabel(itemName);
-
-                    // 라벨에 ActionListener 추가
-                    resultLabel.addMouseListener(new java.awt.event.MouseAdapter() {
-                        public void mouseClicked(java.awt.event.MouseEvent evt) {
-                            // 라벨을 클릭했을 때 수행할 메서드 호출
-                            handleResultLabelClick(itemElement, resultLabel); // 라벨과 함께 전달
-                        }
-                    });
-
-                    searchResultsPanel.add(resultLabel);
+                    listModel.addElement(itemName);
                 }
             }
-
-            // 검색 결과 보여주는 프레임 생성
-            JFrame resultsFrame = new JFrame("검색 결과");
-            resultsFrame.setLayout(new BorderLayout());
-            resultsFrame.setSize(200, 200);
-
-            resultsFrame.add(searchResultsPanel, BorderLayout.SOUTH);
-
-            // 프레임을 보이게 한다.
-            resultsFrame.setVisible(true);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -246,11 +224,29 @@ class Panel5Action { // 주식 매매 기록
         }
     }
 
-    private static void handleResultLabelClick(Element itemElement, JLabel resultLabel) {
-        // 이 부분에서 검색 결과 항목을 클릭했을 때 수행할 동작을 구현해주세요.
-        resultLabel.setForeground(Color.BLUE);
+    private static String[] getLastBusinessDayRange() {
+        Calendar calendar = Calendar.getInstance();
+        int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
+        if (dayOfWeek == Calendar.SATURDAY) {
+            calendar.add(Calendar.DAY_OF_MONTH, -1);
+        } else if (dayOfWeek == Calendar.SUNDAY) {
+            calendar.add(Calendar.DAY_OF_MONTH, -2);
+        }
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+        String todt = dateFormat.format(calendar.getTime());
+        calendar.add(Calendar.MONTH, -1);
+        String frdt = dateFormat.format(calendar.getTime());
+
+        return new String[]{frdt, todt};
     }
-}
+
+    private static void handleResultLabelClick(String selectedStockName) {
+        SellBuy sb = new SellBuy();
+        sb.setFrame(sb);
+        sb.setSelectedStockName(selectedStockName);
+        sb.openFrame(selectedStockName);
+    }}
 
 /* 1. stock table 검색 후 없으면 삽입
 
