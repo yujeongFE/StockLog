@@ -40,11 +40,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 // 패널 1에 대한 동작을 처리하는 클래스
-class PanelAction1 { // 종목 지수
-    public static void addFunctionality(JPanel panel) {
-        // 패널 1에 추가할 기능 구현
-    }
-}
 
 // 패널 2에 대한 동작을 처리하는 클래스
 // H2_PanelAction2.java 에 있습니다.
@@ -84,6 +79,7 @@ public class Home2 {
         GridBagConstraints gbc = new GridBagConstraints();
 
         JPanel topLeftPanel = createPanelWithBorder("1"); // 종목지수
+        JPanel topLeftPanel2 = createPanelWithBorder("1-1"); // 코스닥 지수
         JPanel topRightPanel1 = createPanelWithBorder("2"); // 종목 차트 (분봉)
         JPanel topRightPanel2 = createPanelWithBorder("2-1"); // 종목 차트 (일봉)
         JPanel bottomLeftPanel = createPanelWithBorder("3"); // 관심주식
@@ -112,6 +108,8 @@ public class Home2 {
         // 패널에 기능 추가
         //PanelAction1.addFunctionality(topLeftPanel); // 패널 1에 기능 추가
         //H2_PanelAction2.addFunctionality(topRightPanel1,stockName); // 패널 2에 기능 추가
+        PanelAction1.addFunctionality(topLeftPanel); // 패널 1에 기능 추가
+        PanelAction1_1.addFunctionality(topLeftPanel2); // 패널 1에 기능 추가
         H2_PanelAction2_1.addFunctionality(topRightPanel2,stockName); // 패널 2-1에 기능 추가
         //PanelAction3.addFunctionality(bottomLeftPanel, userId); // 관심 주식 표시
         //PanelAction4.addFunctionality(bottomRightPanel, userId); // 보유 주식 표시
@@ -122,12 +120,17 @@ public class Home2 {
         // 패널 5-1에 기능 추가
         H2_PanelAction5_1.addFunctionality(rightPanel2);
 
+        JPanel panel11_1 = new JPanel();
+        panel11_1.setLayout(new GridLayout(1, 2));
+        panel11_1.add(topLeftPanel);
+        panel11_1.add(topLeftPanel2);
+
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.weightx = 1.0; // gbc.weightx = 1.0;은 해당 컴포넌트가 그리드의 가로 방향으로 가능한 최대 공간을 차지
+        gbc.weightx = 1.0;
         gbc.weighty = 1.0;
-        gbc.fill = GridBagConstraints.BOTH; // 가로 및 세로 방향으로 모두 공간을 채움 // fill 속성은 해당 컴포넌트가 할당받은 공간을 어떻게 채울지를 지정
-        mainPanel.add(topLeftPanel, gbc);
+        gbc.fill = GridBagConstraints.BOTH;
+        mainPanel.add(panel11_1, gbc);
 
         gbc.gridx = 1;
         gbc.gridy = 0;
