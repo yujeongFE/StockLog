@@ -1,3 +1,8 @@
+package stocklogmanipulation;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -25,17 +30,16 @@ import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-// 패널 6에 대한 동작을 처리하는 클래스
-class PanelAction6 { // 특정 주식에 대한 매도, 매수 리스트
+class Panel5Action { // 주식 매매 기록
     static Object[] row = new Object[8];
     static DefaultTableModel tableModel = new DefaultTableModel();
 
-    public static void addFunctionality(JPanel panel, String userId, String stockName) {
+    public static void addFunctionality(JPanel panel, String userId) {
         DBconnection dbConnector = new DBconnection();
         Connection connection = dbConnector.getConnection();
 
         String id = userId;
-        String query = "SELECT s.NAME, l.COMPANY, l.BUYORSELL, l.DATE, l.PRICE, l.QTY, l.RRATIO, l.MEMO FROM stock s, log l WHERE s.CODE = l.CODE AND U_ID = '" + id + "' AND s.Name = '" + stockName + "'";
+        String query = "SELECT s.NAME, l.COMPANY, l.BUYORSELL, l.DATE, l.PRICE, l.QTY, l.RRATIO, l.MEMO FROM stock s, log l WHERE s.CODE = l.CODE AND U_ID = '" + id + "'";
         try {
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(query);
@@ -247,3 +251,139 @@ class PanelAction6 { // 특정 주식에 대한 매도, 매수 리스트
         resultLabel.setForeground(Color.BLUE);
     }
 }
+
+/* 1. stock table 검색 후 없으면 삽입
+
+String id = userId;
+String stockName = stock;
+String stockCode = code;
+
+// SQL 쿼리 실행
+String query = "SELECT * FROM stock WHERE NAME = '" + stock + "'";
+try {
+    Statement selectStatement = connection.createStatement();
+    ResultSet resultSet = selectStatement.executeQuery(query);
+
+    // 결과가 비어 있는지 확인
+    if (!resultSet.next()) {
+        // 여기에 쿼리 결과가 비어있을 때 실행할 INSERT 쿼리를 작성하고 실행합니다.
+        String insertQuery = "INSERT INTO stock (CODE, NAME) VALUES ('" + stock + "', '" + code + "')";
+        Statement insertStatement = connection.createStatement();
+        insertStatement.executeUpdate(insertQuery);
+    }
+} catch (SQLException e) {
+    e.printStackTrace();
+} finally {
+    // 연결 닫기 등의 마무리 작업
+    dbConnector.closeConnection();
+}
+
+1) 매수일 경우
+2. buystock table에 insert
+
+try {
+    // PreparedStatement 생성
+    String insertQuery = "INSERT INTO buystock (U_ID, CODE, COMPANY, B_DATE, B_PRICE, QTY, MEMO) VALUES (?, ?, ?, ?, ?, ?, ?)";
+    PreparedStatement preparedStatement = connection.prepareStatement(insertQuery);
+
+    // 값을 설정합니다. 여기서 1, 2, 3은 각각 ?에 해당하는 순서입니다.
+    preparedStatement.setString(1, id);
+    preparedStatement.setString(2, code);
+    preparedStatement.setString(3, "value3");
+    preparedStatement.setString(4, "value3");
+    preparedStatement.setString(5, "value3");
+    preparedStatement.setString(6, "value3");
+    preparedStatement.setString(7, "value3");
+
+    // 쿼리 실행
+    preparedStatement.executeUpdate();
+
+    System.out.println("데이터가 성공적으로 삽입되었습니다.");
+} catch (SQLException e) {
+    e.printStackTrace();
+} finally {
+    // 연결 닫기 등의 마무리 작업
+    dbConnector.closeConnection();
+}
+
+3. log table에 insert
+try {
+    // PreparedStatement 생성
+    String insertQuery = "INSERT INTO log (U_ID, CODE, COMPANY, BUYORSELL, DATE, PRICE, QTY, MEMO) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    PreparedStatement preparedStatement = connection.prepareStatement(insertQuery);
+
+    preparedStatement.setString(1, id);
+    preparedStatement.setString(2, code);
+    preparedStatement.setString(3, "value3");
+    preparedStatement.setString(4, "매수");
+    preparedStatement.setString(5, "value3");
+    preparedStatement.setString(6, "value3");
+    preparedStatement.setString(7, "value3");
+    preparedStatement.setString(8, "value3");
+
+    // 쿼리 실행
+    preparedStatement.executeUpdate();
+
+    System.out.println("데이터가 성공적으로 삽입되었습니다.");
+} catch (SQLException e) {
+    e.printStackTrace();
+} finally {
+    // 연결 닫기 등의 마무리 작업
+    dbConnector.closeConnection();
+}
+
+4. have table에 insert(null일 경우에만, 아닐 때는 update)
+// SQL 쿼리 실행
+String query = "SELECT * FROM have WHERE U_ID = '" + stock + "' AND CODE = '" + code + "' AND COMPANY = '" + ? + "'";
+try {
+    PreparedStatement preparedStatement = connection.prepareStatement(query);
+    preparedStatement.setString(1, "company"); // company
+
+    ResultSet resultSet = preparedStatement.executeQuery();
+
+    while (resultSet.next()) {
+        id = resultSet.getObject(1);
+        stockName = resultSet.getObject(1).toString(); // Object를 String으로 변환하여 stockName에 저장
+        code = resultSet.getObject(2);
+        company = resultSet.getObject(3);
+        Date = resultSet.getObject(4);
+        e_price
+        qty
+    }
+
+    // 결과가 비어 있는지 확인
+    if (!resultSet.next()) {
+        // 여기에 쿼리 결과가 비어있을 때 실행할 INSERT 쿼리를 작성하고 실행합니다.
+        String insertQuery = "INSERT INTO have (U_ID, CODE, COMPANY, DATE, E_PRICE, QTY) VALUES (?, ?, ?, ?, ?, ?)";
+        PreparedStatement insertStatement = connection.prepareStatement(insertQuery);
+
+        insertStatement.setString(1, "value1");
+        insertStatement.setString(2, "value2");
+        insertStatement.setString(3, "value3");
+        insertStatement.setString(4, "value4");
+        insertStatement.setString(5, "value4");
+        insertStatement.setString(6, "value4");
+
+        // 쿼리 실행
+        insertStatement.executeUpdate();
+    }
+    else {
+        // 결과가 있으면 UPDATE 실행
+        String updateQuery = "UPDATE have SET column1 = ?, column2 = ?, column3 = ?, column4 = ? WHERE U_ID = ? AND CODE = ? AND COMPANY = ?";
+        PreparedStatement updateStatement = connection.prepareStatement(updateQuery);
+        updateStatement.setString(1, "newValue1");
+        updateStatement.setString(2, "newValue2");
+        updateStatement.setString(3, "newValue3");
+        updateStatement.setString(4, "newValue4");
+        updateStatement.setString(5, id);
+        updateStatement.setString(6, code);
+        updateStatement.setString(7, "newValue5");
+        updateStatement.executeUpdate();
+    }
+} catch (SQLException e) {
+    e.printStackTrace();
+} finally {
+    // 연결 닫기 등의 마무리 작업
+    dbConnector.closeConnection();
+}
+* */

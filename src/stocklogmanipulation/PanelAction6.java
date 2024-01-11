@@ -1,8 +1,5 @@
-package src;
+package stocklogmanipulation;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -30,16 +27,17 @@ import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-class Panel5Action { // 주식 매매 기록
+// 패널 6에 대한 동작을 처리하는 클래스
+class PanelAction6 { // 특정 주식에 대한 매도, 매수 리스트
     static Object[] row = new Object[8];
     static DefaultTableModel tableModel = new DefaultTableModel();
 
-    public static void addFunctionality(JPanel panel, String userId) {
+    public static void addFunctionality(JPanel panel, String userId, String stockName) {
         DBconnection dbConnector = new DBconnection();
         Connection connection = dbConnector.getConnection();
 
         String id = userId;
-        String query = "SELECT s.NAME, l.COMPANY, l.BUYORSELL, l.DATE, l.PRICE, l.QTY, l.RRATIO, l.MEMO FROM stock s, log l WHERE s.CODE = l.CODE AND U_ID = '" + id + "'";
+        String query = "SELECT s.NAME, l.COMPANY, l.BUYORSELL, l.DATE, l.PRICE, l.QTY, l.RRATIO, l.MEMO FROM stock s, log l WHERE s.CODE = l.CODE AND U_ID = '" + id + "' AND s.Name = '" + stockName + "'";
         try {
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(query);
@@ -50,7 +48,7 @@ class Panel5Action { // 주식 매매 기록
             tableModel.addColumn("날짜");
             tableModel.addColumn("주식 단가");
             tableModel.addColumn("수량");
-            tableModel.addColumn("매매비용(세금, 수수료)");
+            tableModel.addColumn("수익률");
             tableModel.addColumn("메모");
 
             while (resultSet.next()) {
@@ -89,6 +87,7 @@ class Panel5Action { // 주식 매매 기록
 
                         // 여기서 선택된 행의 데이터를 얻을 수 있어요.
                         String stockName = (String) tableModel.getValueAt(row, 0); // 종목명은 첫 번째 열(인덱스 0)
+                        // System.out.println(stockName);
                         new Home2(userId, stockName); // 종목명을 이용해 페이지를 열거나 처리하는 함수 호출
                     }
                 }
@@ -136,7 +135,7 @@ class Panel5Action { // 주식 매매 기록
         SellBuyFrame.setVisible(true);
         SellBuyFrame.setLayout(new BorderLayout());
 
-
+        // Add ActionListener to the searchButton
         searchButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -205,7 +204,7 @@ class Panel5Action { // 주식 매매 기록
                 return;
             }
 
-
+            // 패널에 결과값 추가
             JPanel searchResultsPanel = new JPanel(new GridLayout(itemList.getLength(), 1));
 
             for (int i = 0; i < itemList.getLength(); i++) {
@@ -214,14 +213,14 @@ class Panel5Action { // 주식 매매 기록
                     Element itemElement = (Element) itemNode;
                     String itemName = itemElement.getElementsByTagName("itmsNm").item(0).getTextContent();
 
-
+                    // 검색 결과 항목마다 라벨 생성
                     JLabel resultLabel = new JLabel(itemName);
 
-
+                    // 라벨에 ActionListener 추가
                     resultLabel.addMouseListener(new java.awt.event.MouseAdapter() {
                         public void mouseClicked(java.awt.event.MouseEvent evt) {
-
-                            handleResultLabelClick(itemElement, resultLabel);
+                            // 라벨을 클릭했을 때 수행할 메서드 호출
+                            handleResultLabelClick(itemElement, resultLabel); // 라벨과 함께 전달
                         }
                     });
 
@@ -229,14 +228,14 @@ class Panel5Action { // 주식 매매 기록
                 }
             }
 
-
+            // 검색 결과 보여주는 프레임 생성
             JFrame resultsFrame = new JFrame("검색 결과");
             resultsFrame.setLayout(new BorderLayout());
             resultsFrame.setSize(200, 200);
 
             resultsFrame.add(searchResultsPanel, BorderLayout.SOUTH);
 
-
+            // 프레임을 보이게 한다.
             resultsFrame.setVisible(true);
 
         } catch (Exception e) {
@@ -246,10 +245,7 @@ class Panel5Action { // 주식 매매 기록
     }
 
     private static void handleResultLabelClick(Element itemElement, JLabel resultLabel) {
+        // 이 부분에서 검색 결과 항목을 클릭했을 때 수행할 동작을 구현해주세요.
         resultLabel.setForeground(Color.BLUE);
-        SellBuy sb = new SellBuy();
-        sb.setFrame(sb);
-        String selectedStockName = itemElement.getElementsByTagName("itmsNm").item(0).getTextContent();
-        sb.setSelectedStockName(selectedStockName);
-        sb.openFrame(selectedStockName);
-    }}
+    }
+}

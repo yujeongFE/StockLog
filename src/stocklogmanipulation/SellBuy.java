@@ -1,4 +1,4 @@
-package src;
+package stocklogmanipulation;
 
 import javax.swing.*;
 import java.awt.*;
@@ -6,7 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.NumberFormat;
 
-import static src.Panel5Action.tableModel;
+import static stocklogmanipulation.Panel5Action.tableModel;
 
 public class SellBuy {
 
@@ -18,15 +18,11 @@ public class SellBuy {
     public static void main(String[] args) {
         SellBuy sb = new SellBuy();
         sb.setFrame(sb);
-
-
-
     }
 
     public void setSelectedStockName(String stockName) {
         selectedStockName = stockName;
     }
-
 
     public void setFrame(SellBuy sb) {
         JFrame jf = new JFrame();
@@ -41,16 +37,12 @@ public class SellBuy {
         jf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         jf.setSize(500, 500);
         jf.setVisible(true);
-
-
-
     }
 
     public void openFrame(String selectedStockName) {
         card.show(sellbuylog, sp.getName());
         sp.setStockNameTextField(selectedStockName);
     }
-
 }
 
 class SellBuyPanel extends JPanel {
@@ -63,20 +55,9 @@ class SellBuyPanel extends JPanel {
     private JTextArea memo;
     private JButton addButton;
 
-
-
-
     public void setStockNameTextField(String stockName) {
         itemname.setText(stockName);
     }
-
-
-
-
-
-
-
-
 
     public JPanel mainPanel;
 

@@ -1,3 +1,5 @@
+package stocklogmanipulation;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -21,7 +23,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 // 패널 4에 대한 동작을 처리하는 클래스
-class PanelAction4 { // 보유주식
+class Panel4Action { // 보유주식
     static Object[] row = new Object[7];
     // 데이터를 담을 테이블 모델 생성
     static double e_price;

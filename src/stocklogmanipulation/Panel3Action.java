@@ -1,3 +1,5 @@
+package stocklogmanipulation;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -29,8 +31,10 @@ class Panel3Action { // 관심주식
     // 데이터를 담을 테이블 모델 생성
     static DefaultTableModel tableModel = new DefaultTableModel();
 
+
     // 사용자가 입력한 관심 주식 데이터를 저장할 정적 변수(H2_PanelAction5.java에서 필요)
     static String userInterestStock;
+
 
     public static void addFunctionality(JPanel panel, String userId) {
         // 데이터베이스 연결
@@ -45,21 +49,41 @@ class Panel3Action { // 관심주식
             ResultSet resultSet = statement.executeQuery(query);
 
             // 원하는 컬럼 순서와 이름을 추가
-            tableModel.addColumn("종목명");
-            tableModel.addColumn("종목코드");
+            tableModel.addColumn("종목명"); //
+            tableModel.addColumn("종목코드"); //
             tableModel.addColumn("현재주가");
-            tableModel.addColumn("시장 구분");
+            tableModel.addColumn("시장 구분"); //
             tableModel.addColumn("전일대비등락");
             tableModel.addColumn("전일대비등락비");
-            tableModel.addColumn("메모");
+            tableModel.addColumn("메모"); //
 
             // 결과셋의 데이터를 테이블 모델에 추가
+            String stockName = null; // 변수를 루프 바깥에 선언하고 초기화
             while (resultSet.next()) {
                 row[0] = resultSet.getObject(1);
+                stockName = resultSet.getObject(1).toString(); // Object를 String으로 변환하여 stockName에 저장
                 row[1] = resultSet.getObject(2);
                 row[3] = resultSet.getObject(3);
                 row[6] = resultSet.getObject(4);
-                tableModel.addRow(row);
+                // tableModel.addRow(row);
+            }
+
+            // 날짜 범위 설정
+            String[] dateRange = getLastBusinessDayRange();
+            String frdt = dateRange[0];
+            String todt = dateRange[1];
+
+            if (stockName != null) {
+                // 종목명을 URL 인코딩하여 API 호출
+                StringBuffer stockPriceData = getStockPrice(URLEncoder.encode(stockName, "UTF-8"), frdt, todt);
+
+                if (stockPriceData.length() > 0) {
+                    // 데이터 파싱 및 표로 정리하여 출력
+                    printStockPriceTable(stockPriceData);
+                } else {
+                    System.out.println("No stock price data available for the specified parameters.");
+                }
+            } else {
             }
 
             // JButton 생성 및 패널에 추가
@@ -72,6 +96,7 @@ class Panel3Action { // 관심주식
                 }
             });
             panel.add(searchButton, BorderLayout.SOUTH);  // Add the button to the SOUTH position of the panel
+
 
             // JLabel 생성 및 패널에 추가
             JLabel label = new JLabel("관심 주식", SwingConstants.CENTER); // SwingConstants.CENTER로 가운데 정렬
@@ -90,6 +115,7 @@ class Panel3Action { // 관심주식
 
                         // 여기서 선택된 행의 데이터를 얻을 수 있어요.
                         String stockName = (String) tableModel.getValueAt(row, 0); // 종목명은 첫 번째 열(인덱스 0)
+                        // System.out.println(stockName);
                         new Home2(userId, stockName); // 종목명을 이용해 페이지를 열거나 처리하는 함수 호출
                     }
                 }
@@ -114,12 +140,15 @@ class Panel3Action { // 관심주식
 
         } catch (SQLException e) {
             e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         } finally {
             // 연결 닫기
             dbConnector.closeConnection();
         }
     }
-
     private static String[] getLastBusinessDayRange() {
         Calendar calendar = Calendar.getInstance();
 
@@ -174,10 +203,10 @@ class Panel3Action { // 관심주식
         }
         return strBuffer;
     }
-    private static String getStockPrice(String likeSrtnCd, String frdt, String todt) throws Exception {
+
+    private static StringBuffer getStockPrice(String likeSrtnCd, String frdt, String todt) throws Exception {
         BufferedReader in = null;
-        String userSearchTerm = URLEncoder.encode(likeSrtnCd, "UTF-8");
-        String matchingStockPrice = null;
+        StringBuffer strBuffer = new StringBuffer();
 
         try {
             // 외부 API 호출을 위한 URL 설정
@@ -185,33 +214,28 @@ class Panel3Action { // 관심주식
             urlStr += "serviceKey=" + "1%2FWP%2BVc3M5kGU2bikqOuBl9hAtMQ7OeqB24EL0llGF9zC75kdgM1jbsTy90LiI9hmDwU7jeFjW8P%2B1VPFtc%2BDg%3D%3D";  // API 키를 적절하게 설정
             urlStr += "&beginBasDt=" + frdt;
             urlStr += "&endBasDt=" + todt;
-            urlStr += "&itmsNm=" + userSearchTerm;
+            urlStr += "&itmsNm=" + likeSrtnCd;
 
             URL obj = new URL(urlStr);
             HttpURLConnection con = (HttpURLConnection) obj.openConnection();
             con.setRequestMethod("GET");
 
             // API 응답 읽기
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF-8"))) {
-                StringBuilder response = new StringBuilder();
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    response.append(line);
-                }
+            in = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF-8"));
 
-                // 사용자 검색어와 일치하는 항목이 있는지 확인
-                if (response.toString().contains(userSearchTerm)) {
-                    matchingStockPrice = response.toString();
-                }
+            String line;
+            while ((line = in.readLine()) != null) {
+                strBuffer.append(line);
             }
+
         } finally {
-            // HttpURLConnection 리소스 닫기
-
+            // BufferedReader 리소스 닫기
+            if (in != null) {
+                in.close();
+            }
         }
-
-        return matchingStockPrice;
+        return strBuffer;
     }
-
     private static void printStockPriceTable(StringBuffer xmlData) throws Exception {
         DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
@@ -523,7 +547,7 @@ class Panel3Action { // 관심주식
                         String todt = dateRange[1];
 
                         // Make the API request
-                        String stockPriceData = getStockPrice(encodedSearchTerm, frdt, todt);
+                        String stockPriceData = getStockPrice(encodedSearchTerm, frdt, todt).toString();
 
                         if (stockPriceData.length() > 0) {
                             // Update the UI based on the response

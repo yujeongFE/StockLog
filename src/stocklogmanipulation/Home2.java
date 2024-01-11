@@ -1,3 +1,5 @@
+package stocklogmanipulation;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -111,16 +113,16 @@ public class Home2 {
 
         // 패널에 기능 추가
         //PanelAction1.addFunctionality(topLeftPanel); // 패널 1에 기능 추가
-        //H2_PanelAction2.addFunctionality(topRightPanel1,stockName); // 패널 2에 기능 추가
+        H2_PanelAction2.addFunctionality(topRightPanel1,stockName); // 패널 2에 기능 추가
         H2_PanelAction2_1.addFunctionality(topRightPanel2,stockName); // 패널 2-1에 기능 추가
-        //PanelAction3.addFunctionality(bottomLeftPanel, userId); // 관심 주식 표시
-        //PanelAction4.addFunctionality(bottomRightPanel, userId); // 보유 주식 표시
+        PanelAction3.addFunctionality(bottomLeftPanel, userId); // 관심 주식 표시
+        PanelAction4.addFunctionality(bottomRightPanel, userId); // 보유 주식 표시
         H2_PanelAction5.addFunctionality(rightPanel1, stockName); // 패널 5에 기능 추가
-        //PanelAction6.addFunctionality(rightBottomPanel, userId, stockName); // 패널 6에 기능 추가
+        PanelAction6.addFunctionality(rightBottomPanel, userId, stockName); // 패널 6에 기능 추가
         PanelAction7.addFunctionality(bottomPanel); // 하단 바에 기능 추가
 
         // 패널 5-1에 기능 추가
-        H2_PanelAction5_1.addFunctionality(rightPanel2);
+        // H2_PanelAction5_1.addFunctionality(rightPanel2);
 
         gbc.gridx = 0;
         gbc.gridy = 0;
