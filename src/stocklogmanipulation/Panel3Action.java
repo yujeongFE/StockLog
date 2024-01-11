@@ -249,11 +249,15 @@ class Panel3Action { // 관심주식
         Panel3Action.userInterestStock = userInterestStock;
 
         // 출력 행 구성
-        for (int i = 0; i < itemList.getLength(); i++) {
-            Node itemNode = itemList.item(i);
+        // 출력 행 구성 (첫 번째 아이템만 추가)
+        if (itemList.getLength() > 0) {
+            Node itemNode = itemList.item(0);
             if (itemNode.getNodeType() == Node.ELEMENT_NODE) {
                 Element itemElement = (Element) itemNode;
+                row[0] = getValue("itmsNm", itemElement);
+                row[1] = getValue("srtnCd", itemElement);
                 row[2] = getValue("clpr", itemElement);
+                row[3] = getValue("mrktCtg", itemElement);
                 row[4] = getValue("vs", itemElement);
                 row[5] = getValue("fltRt", itemElement);
                 tableModel.addRow(row);
@@ -298,7 +302,6 @@ class Panel3Action { // 관심주식
         panel.add(scrollPane, BorderLayout.CENTER); // Changed to CENTER
         searchList.setVisible(true);
         scrollPane.setVisible(true);
-
         text.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
@@ -504,7 +507,6 @@ class Panel3Action { // 관심주식
                                 row[4] = item.getElementsByTagName("vs").item(0).getTextContent();
                                 row[5] = item.getElementsByTagName("fltRt").item(0).getTextContent();
 
-                                // 새로운 행 추가
                                 tableModel.addRow(row);
                             }
                         } else {
@@ -561,8 +563,10 @@ class Panel3Action { // 관심주식
 
                             // "itmsNm" 태그에서 데이터 추출
                             NodeList itemList = document.getElementsByTagName("item");
-                            for (int i = 0; i < itemList.getLength(); i++) {
-                                Element item = (Element) itemList.item(i);
+
+                            if (itemList.getLength() > 0) {
+                                // Process only the first item (assuming it's the most recent)
+                                Element item = (Element) itemList.item(0);
                                 row[0] = item.getElementsByTagName("itmsNm").item(0).getTextContent();
                                 row[2] = item.getElementsByTagName("clpr").item(0).getTextContent();
                                 row[4] = item.getElementsByTagName("vs").item(0).getTextContent();
@@ -570,6 +574,8 @@ class Panel3Action { // 관심주식
 
                                 // Add a new row to the table model (기존 코드에서 주석 처리된 부분 해제)
                                 tableModel.addRow(row);
+                            } else {
+                                System.out.println("No stock price data available for the specified parameters.");
                             }
                         } else {
                             System.out.println("No stock price data available for the specified parameters.");
