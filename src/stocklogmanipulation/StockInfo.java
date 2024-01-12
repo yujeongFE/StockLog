@@ -1,45 +1,17 @@
 package stocklogmanipulation;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import javax.swing.*;
 import java.awt.*;
 import javax.swing.border.Border;
 
 // 패널 5
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.io.IOException;
 
 // 패널 5-1
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.net.URLEncoder;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.BorderFactory;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.table.DefaultTableModel;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 
 // 패널 1에 대한 동작을 처리하는 클래스
 
@@ -67,11 +39,11 @@ class PanelAction7 { // 매도주식
     }
 }
 
-public class Home2 {
+public class StockInfo {
     static String userId; // 사용자 id 저장 변수 추가
     static String stockName; // 주식종목명 저장 변수 추가
 
-    public Home2(String userId, String stockName) {
+    public StockInfo(String userId, String stockName) {
         this.userId = userId;
         this.stockName = stockName;
 
@@ -149,7 +121,7 @@ public class Home2 {
         // 패널 5와 패널 5-1 설정
         gbc.gridx = 2;
         gbc.gridy = 0;
-        gbc.weightx = 0.1;
+        gbc.weightx = 0.2;
         mainPanel.add(panel55_1, gbc);
 
         // 패널 6 설정
@@ -180,7 +152,7 @@ public class Home2 {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             try {
-                Home2 home2 = new Home2(userId, stockName);
+                StockInfo home2 = new StockInfo(userId, stockName);
             } catch (Exception e) {
                 e.printStackTrace();
             }

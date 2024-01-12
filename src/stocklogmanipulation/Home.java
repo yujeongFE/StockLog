@@ -7,29 +7,9 @@ import java.awt.*;
 // 패널 3
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import java.io.UnsupportedEncodingException;
-import java.sql.*;
-import javax.swing.table.*;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
 
 // 패널 3.2
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Scanner;
 
 // 하단바에 대한 동작을 처리하는 클래스
 class Panel6Action { // 매도주식

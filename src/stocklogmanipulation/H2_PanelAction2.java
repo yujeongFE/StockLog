@@ -1,19 +1,17 @@
 package stocklogmanipulation;
 import org.apache.poi.ss.usermodel.*;
 //import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 import java.io.FileInputStream;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.category.DefaultCategoryDataset;
 
-import static stocklogmanipulation.Home2.stockName;
+import static stocklogmanipulation.StockInfo.stockName;
 
 
 class H2_PanelAction2 extends JPanel {
