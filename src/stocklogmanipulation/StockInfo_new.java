@@ -3,16 +3,18 @@ package stocklogmanipulation;
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
+import javax.swing.JToolBar;
 
-public class Home_new {
+public class StockInfo_new {
     static String userId; // 사용자 id 저장 변수 추가
-    public Home_new(String userId){
+    static String stockName; // 주식종목명 저장 변수 추가
+    public StockInfo_new(String userId, String stockName){
         this.userId = userId;
+        this.stockName = stockName;
 
         SwingUtilities.invokeLater(() -> {
-            JFrame frame = new JFrame("주식 매매 관리 시스템");
+            JFrame frame = new JFrame("1주식 매매 관리 시스템1");
 
             JDesktopPane desktopPane = new JDesktopPane();
 
@@ -45,8 +47,8 @@ public class Home_new {
             desktopPane.add(internalFrame1);
 
             // innerframe2 생성, 추가
-            JInternalFrame internalFrame2 = new JInternalFrame("전체 수익률보기", true, true, true, true);
-            JPanel internalPanel2 = createPanelWithBorder("수익률보기");
+            JInternalFrame internalFrame2 = new JInternalFrame("종목 차트", true, true, true, true);
+            JPanel internalPanel2 = createPanelWithBorder("종목 차트");
             internalFrame2.getContentPane().add(internalPanel2);
             internalFrame2.setSize(width, height);
             internalFrame2.setLocation(1 * width, 0);
@@ -72,22 +74,41 @@ public class Home_new {
             desktopPane.add(internalFrame4);
 
             // innerframe5 생성, 추가
-            JInternalFrame internalFrame5 = new JInternalFrame("주식 매매 일지", true, true, true, true);
-            JPanel internalPanel5 = createPanelWithBorder("주식 매매 일지");
+            JInternalFrame internalFrame5 = new JInternalFrame("관련 뉴스", true, true, true, true);
+            JPanel internalPanel5 = createPanelWithBorder("관련 뉴스");
             internalFrame5.getContentPane().add(internalPanel5);
-            internalFrame5.setSize(width, fullheight);
+            internalFrame5.setSize(width, height/2);
             internalFrame5.setLocation(2 * width, 0);
             internalFrame5.setVisible(true);
             desktopPane.add(internalFrame5);
 
+            // innerframe5_1 생성, 추가
+            JInternalFrame internalFrame5_1 = new JInternalFrame("관련 뉴스", true, true, true, true);
+            JPanel internalPanel5_1 = createPanelWithBorder("관련 뉴스");
+            internalFrame5_1.getContentPane().add(internalPanel5_1);
+            internalFrame5_1.setSize(width, height / 2);
+            internalFrame5_1.setLocation(2 * width, height / 2);
+            internalFrame5_1.setVisible(true);
+            desktopPane.add(internalFrame5_1);
+
+            // innerframe6 생성, 추가
+            JInternalFrame internalFrame6 = new JInternalFrame("주식 매매 일지", true, true, true, true);
+            JPanel internalPanel6 = createPanelWithBorder("주식 매매 일지");
+            internalFrame6.getContentPane().add(internalPanel6);
+            internalFrame6.setSize(width, height);
+            internalFrame6.setLocation(2 * width, height);
+            internalFrame6.setVisible(true);
+            desktopPane.add(internalFrame6);
+
             // 패널에 기능 추가
             Panel1Action.addFunctionality(internalPanel1); // 패널 1에 기능 추가
             // Panel11Action.addFunctionality(internalPanel2, "전체 수익률보기");
-            Panel2Action.addFunctionality(internalPanel2, userId); // 패널 2에 기능 추가
-            Panel3Action.addFunctionality(internalPanel3, userId); // 관심 주식 표시
-            Panel4Action.addFunctionality(internalPanel4, userId); // 보유 주식 표시
-            Panel5Action.addFunctionality(internalPanel5, userId); // 패널 5에 기능 추가
-            // Panel6Action.addFunctionality(bottomPanel); // 하단 바에 기능 추가
+            // Panel2Action.addFunctionality(internalPanel2, userId); // 패널 2에 기능 추가
+            PanelAction3.addFunctionality(internalPanel3, userId); // 관심 주식 표시
+            PanelAction4.addFunctionality(internalPanel4, userId); // 보유 주식 표시
+            H2_PanelAction5.addFunctionality(internalPanel5, stockName); // 패널 5에 기능 추가
+            H2_PanelAction5_1.addFunctionality(internalPanel5_1); // 패널5-1에 기능 추가
+            PanelAction6.addFunctionality(internalPanel6, userId, stockName); // 패널 6에 기능 추가
 
             frame.add(desktopPane);
             frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -95,13 +116,6 @@ public class Home_new {
             frame.setLocationRelativeTo(null);
             frame.setVisible(true);
         });
-    }
-    public static void main(String[] args) {
-        DBconnection dbConnector = new DBconnection();
-        SwingUtilities.invokeLater(() -> {
-            Home_new home = new Home_new(userId);
-        });
-
     }
 
     private static JPanel createPanelWithBorder(String text) {
@@ -121,7 +135,7 @@ public class Home_new {
 
         // 툴바에 버튼 추가
         JButton button1 = new JButton("버튼 1");
-        JButton button2 = new JButton("버튼 2");
+        JButton button2 = new JButton("버튼 3");
 
         // 각 버튼에 액션 추가
         button1.addActionListener(new ActionListener() {
@@ -146,5 +160,13 @@ public class Home_new {
         toolBar.add(button2);
 
         return toolBar;
+    }
+
+    public static void main(String[] args) {
+        DBconnection dbConnector = new DBconnection();
+        SwingUtilities.invokeLater(() -> {
+            StockInfo_new home = new StockInfo_new(userId, stockName);
+        });
+
     }
 }
