@@ -11,8 +11,7 @@ import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.category.DefaultCategoryDataset;
 
-import static stocklogmanipulation.StockInfo.stockName;
-
+import static stocklogmanipulation.StockInfo_new.stockName;
 
 class H2_PanelAction2 extends JPanel {
 
