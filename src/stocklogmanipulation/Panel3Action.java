@@ -193,7 +193,6 @@ public class Panel3Action { // 관심주식
             urlStr += "&beginBasDt=" + frdt;
             urlStr += "&endBasDt=" + todt;
             urlStr += "&likeItmsNm=" + encodedSearchTerm;
-            System.out.println(urlStr);
 
             URL obj = new URL(urlStr);
             HttpURLConnection con = (HttpURLConnection) obj.openConnection();

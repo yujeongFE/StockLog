@@ -14,7 +14,7 @@ public class StockInfo_new {
         this.stockName = stockName;
 
         SwingUtilities.invokeLater(() -> {
-            JFrame frame = new JFrame("1주식 매매 관리 시스템1");
+            JFrame frame = new JFrame("주식 매매 관리 시스템");
 
             JDesktopPane desktopPane = new JDesktopPane();
 
