@@ -50,17 +50,26 @@ public class StockInfo_new {
             JInternalFrame internalFrame2 = new JInternalFrame("종목 차트", true, true, true, true);
             JPanel internalPanel2 = createPanelWithBorder("종목 차트");
             internalFrame2.getContentPane().add(internalPanel2);
-            internalFrame2.setSize(width, height);
+            internalFrame2.setSize(width, height / 2);
             internalFrame2.setLocation(1 * width, 0);
             internalFrame2.setVisible(true);
             desktopPane.add(internalFrame2);
+
+            // innerframe2_1 생성, 추가
+            JInternalFrame internalFrame2_1 = new JInternalFrame("종목 차트2", true, true, true, true);
+            JPanel internalPanel2_1 = createPanelWithBorder("종목 차트2");
+            internalFrame2_1.getContentPane().add(internalPanel2_1);
+            internalFrame2_1.setSize(width, height / 2);
+            internalFrame2_1.setLocation(1 * width, height / 2);
+            internalFrame2_1.setVisible(true);
+            desktopPane.add(internalFrame2_1);
 
             // innerframe3 생성, 추가
             JInternalFrame internalFrame3 = new JInternalFrame("관심 주식", true, true, true, true);
             JPanel internalPanel3 = createPanelWithBorder("관심 주식");
             internalFrame3.getContentPane().add(internalPanel3);
             internalFrame3.setSize(width, height);
-            internalFrame3.setLocation(0, 1 * height);
+            internalFrame3.setLocation(0, height);
             internalFrame3.setVisible(true);
             desktopPane.add(internalFrame3);
 
@@ -69,7 +78,7 @@ public class StockInfo_new {
             JPanel internalPanel4 = createPanelWithBorder("보유 주식");
             internalFrame4.getContentPane().add(internalPanel4);
             internalFrame4.setSize(width, height);
-            internalFrame4.setLocation(1 * width, 1 * height);
+            internalFrame4.setLocation(1 * width, height);
             internalFrame4.setVisible(true);
             desktopPane.add(internalFrame4);
 
@@ -102,13 +111,15 @@ public class StockInfo_new {
 
             // 패널에 기능 추가
             Panel1Action.addFunctionality(internalPanel1); // 패널 1에 기능 추가
-            // Panel11Action.addFunctionality(internalPanel2, "전체 수익률보기");
-            // Panel2Action.addFunctionality(internalPanel2, userId); // 패널 2에 기능 추가
+            // Panel11Action.addFunctionality(internalPanel1);
+            // H2_PanelAction2.addFunctionality(internalPanel2,stockName); // 패널 2에 기능 추가
+            // H2_PanelAction2_1.addFunctionality(internalPanel2_1,stockName); // 패널 2-1에 기능 추가
             PanelAction3.addFunctionality(internalPanel3, userId); // 관심 주식 표시
             PanelAction4.addFunctionality(internalPanel4, userId); // 보유 주식 표시
             H2_PanelAction5.addFunctionality(internalPanel5, stockName); // 패널 5에 기능 추가
             H2_PanelAction5_1.addFunctionality(internalPanel5_1); // 패널5-1에 기능 추가
             PanelAction6.addFunctionality(internalPanel6, userId, stockName); // 패널 6에 기능 추가
+            Panel6Action.executeApiRequestAndDisplayInPanel(bottomPanel); // 하단 바에 기능 추가
 
             frame.add(desktopPane);
             frame.setExtendedState(JFrame.MAXIMIZED_BOTH);

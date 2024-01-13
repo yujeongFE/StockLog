@@ -10,14 +10,6 @@ import javax.swing.JLabel;
 
 // 패널 3.2
 
-
-// 하단바에 대한 동작을 처리하는 클래스
-class Panel6Action { // 매도주식
-    public static void addFunctionality(JPanel panel) {
-        // 하단바에 추가할 기능 구현
-    }
-}
-
 public class Home {
     static String userId; // 사용자 id 저장 변수 추가
 

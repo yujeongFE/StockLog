@@ -87,7 +87,7 @@ public class Home_new {
             Panel3Action.addFunctionality(internalPanel3, userId); // 관심 주식 표시
             Panel4Action.addFunctionality(internalPanel4, userId); // 보유 주식 표시
             Panel5Action.addFunctionality(internalPanel5, userId); // 패널 5에 기능 추가
-            // Panel6Action.addFunctionality(bottomPanel); // 하단 바에 기능 추가
+            Panel6Action.executeApiRequestAndDisplayInPanel(bottomPanel); // 하단 바에 기능 추가
 
             frame.add(desktopPane);
             frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
